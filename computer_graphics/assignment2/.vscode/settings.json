@@ -1,0 +1,8 @@
+{
+	"files.associations": {
+		"*.txt": "plaintext",
+		"chrono": "cpp",
+		"cmath": "cpp",
+		"utility": "cpp"
+	}
+}

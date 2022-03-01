@@ -1,0 +1,8 @@
+{
+	"files.associations": {
+		"*.txt": "plaintext",
+		"functional": "cpp",
+		"memory": "cpp",
+		"cmath": "cpp"
+	}
+}

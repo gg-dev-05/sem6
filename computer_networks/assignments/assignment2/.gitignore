@@ -1,0 +1,10 @@
+# ignore all files
+*
+
+# un-ignore all folder
+!*/
+
+# un-ignore all files with extension
+!*.*
+
+.vscode/

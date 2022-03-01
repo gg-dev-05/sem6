@@ -1,0 +1,20 @@
+1)
+	a.) parent(X, Pat).
+	b.) parent(Liz, X).
+	c.) parent(X, Y), parent(Y, Pat).
+
+2)
+	a.) happy(X) :- parent(X,_). 
+
+	b.) hasTwoChildren(X) :- 
+			parent(X,Y), 
+			sister(Y,_).
+
+	c.) grandChild(Z,X) :- 
+			parent(X,Y), 
+			parent(Y,Z).
+
+	d.) aunt(X,Y) :- 
+			parent(Z,Y),
+            sister(X,Z).
+			

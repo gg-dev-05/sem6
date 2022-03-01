@@ -1,0 +1,8 @@
+{
+  "files.associations": {
+    "*.txt": "plaintext",
+    "connections.h": "c",
+    "stdio.h": "c",
+    "iostream": "cpp"
+  }
+}

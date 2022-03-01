@@ -1,0 +1,18 @@
+import numpy as np
+class Model:
+  def __init__(self, num_inputs):
+    self.weights = np.zeros(num_inputs)
+    self.bias = 0
+  def predict(self, inputs):
+    sum = np.dot(inputs, self.weights[:]) + self.bias
+    if sum > 0:
+      prediction = 1
+    else:
+      prediction = 0
+    return prediction
+  def fit(self, inputs, label, epochs=10, learning_rate=0.1):
+    for _ in range(epochs):
+      for val, res in zip(inputs, label):
+        prediction= self.predict(val)
+        self.weights[:] += learning_rate * (res-prediction) * val
+        self.bias += learning_rate *(res-prediction)
