@@ -1,5 +1,3 @@
-#include <GL/gl.h>
-#include <GL/glu.h>
 #include <GL/glut.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -43,15 +41,42 @@ GLubyte *makeTexImage(char *loadfile) {
 }
 
 void init(void) {
-    glClearColor(0, 0, 0, 1.0);
-    glShadeModel(GL_FLAT);
+    // glClearColor(0, 0, 0, 1.0);
+    // glShadeModel(GL_FLAT);
 
-    //  glEnable(GL_LIGHTING);
+    // //  glEnable(GL_LIGHTING);
+
+    // glEnable(GL_DEPTH_TEST);
+
+    // glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    // // handles is global
+    // glGenTextures(6, handles);
+    // for (int i = 0; i < 6; ++i) {
+    //     GLubyte *texImage = makeTexImage(maps[i]);
+    //     if (!texImage) {
+    //         printf("\nError reading %s \n", maps[i]);
+    //         continue;
+    //     }
+    //     glBindTexture(GL_TEXTURE_2D, handles[i]);  // now we work on handles
+    //     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    //     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    //     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    //     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    //     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, texImageWidth,
+    //                  texImageHeight, 0, GL_RGBA, GL_UNSIGNED_BYTE, texImage);
+
+    //     delete texImage;  // free memory holding texture image
+    // }
+    // printf("\nUse mouse to rotate the cube and s or S to swap rotating axis and L to change light shades\n");
+
+    // glClearColor(0.2, 0.2, 0.8, 0.0);
+    glShadeModel(GL_FLAT);
+    glTranslatef(0.0, 0.0, -5.0);
 
     glEnable(GL_DEPTH_TEST);
 
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-    // handles is global
+    // texName is global
     glGenTextures(6, handles);
     for (int i = 0; i < 6; ++i) {
         GLubyte *texImage = makeTexImage(maps[i]);
@@ -59,7 +84,7 @@ void init(void) {
             printf("\nError reading %s \n", maps[i]);
             continue;
         }
-        glBindTexture(GL_TEXTURE_2D, handles[i]);  // now we work on handles
+        glBindTexture(GL_TEXTURE_2D, handles[i]);  // now we work on texName
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -69,7 +94,6 @@ void init(void) {
 
         delete texImage;  // free memory holding texture image
     }
-    printf("\nUse mouse to rotate the cube and s or S to swap rotating axis and L to change light shades\n");
 }
 
 void display(void) {

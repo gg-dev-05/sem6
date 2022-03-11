@@ -18,10 +18,15 @@ GLfloat light_ambient[] = {0.0, 0.0, 0.0, 1.0};
 GLfloat light_specular[] = {1.0, 1.0, 1.0, 1.0};
 GLfloat light_position[] = {1.0, 1.0, 0.0, 0.0};
 
+int light = 0;
+float red = 0;
+int sign = 1;
+float green = 0;
+float blue = 0;
 int anglex = 0, angley = 0, anglez = 0;  // rotation angles
 // images for texture maps for 6 faces of cube
-char maps[][12] = {"text.png", "text.png", "texture.png", "text.png",
-                   "text.png", "texture.png"};
+char maps[][12] = {"text.png", "texture.png", "texture.png", "text.png",
+                   "texture.png", "texture.png"};
 int texImageWidth;
 int texImageHeight;
 static GLuint texName[6];  // texture names
@@ -73,6 +78,14 @@ void draw() {
     glEnable(GL_TEXTURE_2D);
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
 
+    int faces[][2][4][3] = {
+        {{{-1, -1, -1}, {-1, -1, 1}, {1, -1, 1}, {1, -1, -1}}, {0, -1, 0}},   // bottom
+        {{{-1, -1, -1}, {-1, -1, 1}, {-1, 1, 1}, {-1, 1, -1}}, {-1, 0, 0}},   // left
+        {{{1, -1, -1}, {1, -1, 1}, {1, 1, 1}, {1, 1, -1}}, {1, 0, 0}},        // right
+        {{{-1, 1, -1}, {-1, 1, 1}, {1, 1, 1}, {1, 1, -1}}, {0, 1, 0}},        // top
+        {{{-1, -1, 1}, {1, -1, 1}, {1, 1, 1}, {-1, 1, 1}}, {0, 0, 1}},        // back
+        {{{-1, -1, -1}, {1, -1, -1}, {1, 1, -1}, {-1, 1, -1}}, {0, 0, -1}}};  // front
+
     // glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
 
@@ -81,23 +94,21 @@ void draw() {
     glRotatef(angley, 0.0, 1.0, 0.0);  // rotate along y-axis
     glRotatef(anglez, 0.0, 0.0, 1.0);  // rotate along y-axis
 
-    glEnable(GL_LIGHTING);
-    glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
-    glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
-    glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
-    glLightfv(GL_LIGHT0, GL_POSITION, light_position);
-    glEnable(GL_LIGHT0);
-    glEnable(GL_COLOR_MATERIAL);
-    glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
-    glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, light_diffuse);
-
-    int faces[][2][4][3] = {
-        {{{-1, -1, -1}, {-1, -1, 1}, {1, -1, 1}, {1, -1, -1}}, {0, -1, 0}},   // bottom
-        {{{-1, -1, -1}, {-1, -1, 1}, {-1, 1, 1}, {-1, 1, -1}}, {-1, 0, 0}},   // left
-        {{{1, -1, -1}, {1, -1, 1}, {1, 1, 1}, {1, 1, -1}}, {1, 0, 0}},        // right
-        {{{-1, 1, -1}, {-1, 1, 1}, {1, 1, 1}, {1, 1, -1}}, {0, 1, 0}},        // top
-        {{{-1, -1, 1}, {1, -1, 1}, {1, 1, 1}, {-1, 1, 1}}, {0, 0, 1}},        // back
-        {{{-1, -1, -1}, {1, -1, -1}, {1, 1, -1}, {-1, 1, -1}}, {0, 0, -1}}};  // front
+    if (light) {
+        glEnable(GL_LIGHTING);
+        glLightfv(GL_LIGHT0, GL_DIFFUSE, light_diffuse);
+        glLightfv(GL_LIGHT0, GL_AMBIENT, light_ambient);
+        glLightfv(GL_LIGHT0, GL_SPECULAR, light_specular);
+        glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+        glEnable(GL_LIGHT0);
+        glEnable(GL_COLOR_MATERIAL);
+        glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, light_diffuse);
+    } else {
+        glDisable(GL_LIGHTING);
+        glDisable(GL_COLOR_MATERIAL);
+        glDisable(GL_LIGHT0);
+    }
 
     glLineWidth(5);
     glBegin(GL_LINES);
@@ -114,10 +125,10 @@ void draw() {
     glVertex3f(0.0, 0.0, 2.0);
     glEnd();
 
-    glColor3f(1, 1, 1);
+    glColor3f(red, green, blue);
     for (int i = 0; i < 6; i++) {
         glPushMatrix();
-        glBindTexture(GL_TEXTURE_2D, texName[0]);
+        glBindTexture(GL_TEXTURE_2D, texName[i]);
         glBegin(GL_QUADS);
         glNormal3i(*faces[i][1][0], *faces[i][1][1], *faces[i][1][2]);
         glTexCoord2f(0.0, 0.0);
@@ -151,8 +162,6 @@ void handleResize(int width, int height) {
     glTranslatef(0, 0, -10);
 }
 
-// draw the hut
-
 void keyboard(unsigned char key, int x, int y) {
     switch (key) {
         case 's':
@@ -173,10 +182,43 @@ void keyboard(unsigned char key, int x, int y) {
         case 'e':
             anglez = (anglez - 5) % 360;
             break;
+        case 'l':
+            if (light)
+                light = 0;
+            else
+                light = 1;
+            break;
+        case 'r':
+            if (red >= 1)
+                sign = -1;
+            if (red <= 0)
+                sign = 1;
+            red = (red + sign * 0.1);
+            break;
+        case 'g':
+            if (green >= 1)
+                sign = -1;
+            if (green <= 0)
+                sign = 1;
+            green = (green + sign * 0.1);
+            break;
+        case 'b':
+            if (blue >= 1)
+                sign = -1;
+            if (blue <= 0)
+                sign = 1;
+            blue = (blue + sign * 0.1);
+            break;
+        case '.':
+            red = blue = green = 1;
+            break;
         case ' ':
             anglex = 0;
             angley = 0;
             anglez = 0;
+            red = 0;
+            green = 0;
+            blue = 0;
             break;
         case 27: /* escape */
             glutDestroyWindow(window);
@@ -200,6 +242,7 @@ int main(int argc, char **argv) {
     glutDisplayFunc(draw);
     glutReshapeFunc(handleResize);
     glutKeyboardFunc(keyboard);
+    glutIdleFunc(draw);
 
     glutMainLoop();  // start the main glut loop
     return 0;
