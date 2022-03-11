@@ -78,15 +78,15 @@ void draw() {
     glEnable(GL_TEXTURE_2D);
     glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL);
 
-    int faces[][2][4][3] = {
-        {{{-1, -1, -1}, {-1, -1, 1}, {1, -1, 1}, {1, -1, -1}}, {0, -1, 0}},   // bottom
-        {{{-1, -1, -1}, {-1, -1, 1}, {-1, 1, 1}, {-1, 1, -1}}, {-1, 0, 0}},   // left
-        {{{1, -1, -1}, {1, -1, 1}, {1, 1, 1}, {1, 1, -1}}, {1, 0, 0}},        // right
-        {{{-1, 1, -1}, {-1, 1, 1}, {1, 1, 1}, {1, 1, -1}}, {0, 1, 0}},        // top
-        {{{-1, -1, 1}, {1, -1, 1}, {1, 1, 1}, {-1, 1, 1}}, {0, 0, 1}},        // back
-        {{{-1, -1, -1}, {1, -1, -1}, {1, 1, -1}, {-1, 1, -1}}, {0, 0, -1}}};  // front
+    int faces[6][4][3] = {
+        {{-1, -1, 1}, {1, -1, 1}, {1, 1, 1}, {-1, 1, 1}},
+        {{-1, 1, -1}, {1, 1, -1}, {1, -1, -1}, {-1, -1, -1}},
+        {{1, -1, 1}, {1, -1, -1}, {1, 1, -1}, {1, 1, 1}},
+        {{-1, -1, 1}, {-1, 1, 1}, {-1, 1, -1}, {-1, -1, -1}},
+        {{-1, 1, 1}, {1, 1, 1}, {1, 1, -1}, {-1, 1, -1}},
+        {{-1, -1, 1}, {-1, -1, -1}, {1, -1, -1}, {1, -1, 1}}};
 
-    // glEnable(GL_CULL_FACE);
+    glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
 
     glPushMatrix();
@@ -130,15 +130,14 @@ void draw() {
         glPushMatrix();
         glBindTexture(GL_TEXTURE_2D, texName[i]);
         glBegin(GL_QUADS);
-        glNormal3i(*faces[i][1][0], *faces[i][1][1], *faces[i][1][2]);
         glTexCoord2f(0.0, 0.0);
-        glVertex3iv(faces[i][0][0]);
+        glVertex3iv(faces[i][0]);
         glTexCoord2f(0.0, 1.0);
-        glVertex3iv(faces[i][0][1]);
+        glVertex3iv(faces[i][1]);
         glTexCoord2f(1.0, 1.0);
-        glVertex3iv(faces[i][0][2]);
+        glVertex3iv(faces[i][2]);
         glTexCoord2f(1.0, 0.0);
-        glVertex3iv(faces[i][0][3]);
+        glVertex3iv(faces[i][3]);
         glEnd();
         glPopMatrix();
     }
