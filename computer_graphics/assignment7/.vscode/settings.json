@@ -1,0 +1,7 @@
+{
+  "files.associations": {
+    "*.txt": "plaintext",
+    "unordered_map": "cpp",
+    "variant": "cpp"
+  }
+}
