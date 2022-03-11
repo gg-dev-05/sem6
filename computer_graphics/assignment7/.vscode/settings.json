@@ -2,6 +2,15 @@
   "files.associations": {
     "*.txt": "plaintext",
     "unordered_map": "cpp",
-    "variant": "cpp"
+    "variant": "cpp",
+    "charconv": "cpp",
+    "cmath": "cpp",
+    "functional": "cpp",
+    "*.tcc": "cpp",
+    "fstream": "cpp",
+    "istream": "cpp",
+    "numeric": "cpp",
+    "ostream": "cpp",
+    "sstream": "cpp"
   }
 }
