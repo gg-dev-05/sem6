@@ -11,7 +11,7 @@ int window;
 GLfloat diffuseLight[] = {1.0, 1.0, 1.0, 1};
 GLfloat ambientLight[] = {0.0, 0.0, 0.0, 1.0};
 GLfloat specularLight[] = {1.0, 1.0, 1.0, 1.0};
-GLfloat positionLight[] = {1.0, 1.0, 0.0, 0.0};
+GLfloat positionLight[] = {1.0, 1.0, 1.0, 0.0};
 static GLuint textures[6];
 int yOrigin = -1, xOrigin = -1;
 float angDelta = 0.0f;
@@ -21,6 +21,10 @@ int angleY = 0, angleZ = 0;
 
 float lx = 0.0f, lz = 0.0f, ly = 0.0f;
 int lightSwitch = 0;
+float red = 0.5;
+float green = 0.1;
+float blue = 0.4;
+int sign = 1;
 
 char maps[][40] = {"textF.png", "textBR.png", "texture.png", "texture.png", "texture.png", "texture.png"};
 double deltaMovX = 0, deltaMovY = 0, deltaMovZ = 5;
@@ -95,6 +99,7 @@ void draw(void) {
     glRotatef(angleY + lz, 0.0, 1.0, 0.0);
     glRotatef(angleZ + ly, 0.0, 0.0, 1.0);
 
+    glColor3f(red, green, blue);
     for (int i = 0; i < 6; ++i) {
         glBindTexture(GL_TEXTURE_2D, textures[i]);
         glBegin(GL_QUADS);
@@ -142,6 +147,27 @@ void keyboard(unsigned char key, int x, int y) {
             lx = 0;
             ly = 0;
             lz = 0;
+            break;
+        case 'r':
+            if (red <= 0)
+                sign = 1;
+            if (red >= 1)
+                sign = -1;
+            red += sign * 0.1;
+            break;
+        case 'g':
+            if (green <= 0)
+                sign = 1;
+            if (green >= 1)
+                sign = -1;
+            green += sign * 0.1;
+            break;
+        case 'b':
+            if (blue <= 0)
+                sign = 1;
+            if (blue >= 1)
+                sign = -1;
+            blue += sign * 0.1;
             break;
         case 27:
             glutDestroyWindow(window);
