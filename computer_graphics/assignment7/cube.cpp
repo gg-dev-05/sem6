@@ -1,6 +1,7 @@
 #include <bits/stdc++.h>
 #include <GL/glut.h>
 #include "imageio.h"
+using namespace std;
 
 #define PERSPECTIVE 60
 #define NEARZ 0.0001
@@ -8,12 +9,7 @@
 int imageWidthText;
 int imageHeightText;
 int window;
-GLfloat diffuseLight[] = {1.0, 1.0, 1.0, 1};
-GLfloat ambientLight[] = {0.0, 0.0, 0.0, 1.0};
-GLfloat specularLight[] = {1.0, 1.0, 1.0, 1.0};
-GLfloat positionLight[] = {1.0, 1.0, 1.0, 0.0};
 static GLuint textures[6];
-int yOrigin = -1, xOrigin = -1;
 float angDelta = 0.0f;
 float angDeltaZ = 0.0f;
 float angleX = 0;
@@ -26,7 +22,7 @@ float green = 0.1;
 float blue = 0.4;
 int sign = 1;
 
-char maps[][40] = {"textF.png", "textBR.png", "texture.png", "texture.png", "texture.png", "texture.png"};
+char maps[][40] = {"texture.png", "textBR.png", "texture.png", "texture.png", "texture.png", "texture.png"};
 double deltaMovX = 0, deltaMovY = 0, deltaMovZ = 5;
 
 GLubyte *generateTextImage(char *loadfile) {
@@ -36,6 +32,19 @@ GLubyte *generateTextImage(char *loadfile) {
     imageWidthText = width;
     imageHeightText = height;
     return texImage;
+}
+
+void DisplayStroke(GLfloat x, GLfloat y, GLfloat z, GLfloat fontSize, GLfloat pointSize, GLfloat rotate, string text) {
+    string buffer = text;
+    glPushMatrix();
+    glTranslatef(x, y, z);
+    glPointSize(pointSize);
+    glLineWidth(pointSize);
+    glRotatef(rotate, 0.0, 1.0, 0.0);
+    glScalef(fontSize, fontSize, fontSize);
+    for (auto ch : buffer)
+        glutStrokeCharacter(GLUT_STROKE_MONO_ROMAN, ch);
+    glPopMatrix();
 }
 
 void initialize(void) {
@@ -51,7 +60,8 @@ void initialize(void) {
             printf("\nError reading %s \n", maps[i]);
             continue;
         }
-        glBindTexture(GL_TEXTURE_2D, textures[i]);  // now we work on handles
+        glBindTexture(GL_TEXTURE_2D, textures[i]);
+        //
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
@@ -83,14 +93,9 @@ void draw(void) {
     if (lightSwitch == 1) {
         glEnable(GL_LIGHTING);
     } else if (lightSwitch == 2) {
-        glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuseLight);
-        glLightfv(GL_LIGHT0, GL_AMBIENT, ambientLight);
-        glLightfv(GL_LIGHT0, GL_SPECULAR, specularLight);
-        glLightfv(GL_LIGHT0, GL_POSITION, positionLight);
         glEnable(GL_LIGHT0);
         glEnable(GL_COLOR_MATERIAL);
         glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE);
-        glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, diffuseLight);
     } else {
         glDisable(GL_LIGHTING);
         glDisable(GL_COLOR_MATERIAL);
@@ -98,6 +103,9 @@ void draw(void) {
     }
     glRotatef(angleY + lz, 0.0, 1.0, 0.0);
     glRotatef(angleZ + ly, 0.0, 0.0, 1.0);
+
+    glColor3f(0.5, 0.5, 1);
+    DisplayStroke(-0.8, -0.2, 1.02, 0.005, 12, 0, "CGV");
 
     glColor3f(red, green, blue);
     for (int i = 0; i < 6; ++i) {
@@ -186,15 +194,6 @@ void handleResize(int w, int h) {
     gluLookAt(deltaMovX, deltaMovY, deltaMovZ, 0, 0, 0, 0, 1, 0);
 }
 
-void mouseEvent(int x, int y) {
-    if (yOrigin >= 0) {
-        angDeltaZ = (x - xOrigin) * 0.3f;
-        angDelta = (y - yOrigin) * 0.3f;
-        lx = angDelta;
-        lz = angDeltaZ;
-    }
-}
-
 double modValue(double x, double y, double z) {
     return sqrt(x * x + y * y + z * z);
 }
@@ -213,6 +212,7 @@ void mousePress(int button, int state, int x, int y) {
 
 int main(int argc, char **argv) {
     glutInit(&argc, argv);
+    // GLUT_DEPTH for using depth buffer
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
     glutInitWindowSize(500, 500);
     glutInitWindowPosition(100, 100);
@@ -224,7 +224,6 @@ int main(int argc, char **argv) {
 
     glutKeyboardFunc(keyboard);
     glutMouseFunc(mousePress);
-    glutMotionFunc(mouseEvent);
     glutMainLoop();
     return 0;
 }
