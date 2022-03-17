@@ -6,6 +6,7 @@ using namespace std;
 #define HEIGHT 500
 double cameraX = 0, cameraY = 0, cameraZ = 5;
 double cameraLookAtX = 0, cameraLookAtY = 0, cameraLookAtZ = 0;
+double theta = 0;
 void display(void) {
     // cameraLookAtX += cameraX;
     // cameraLookAtY += cameraY;
@@ -76,13 +77,17 @@ void keyboard(unsigned char key, int x, int y) {
             cameraZ -= 0.1;
             break;
         case 'a':
-            cameraLookAtX -= 0.1;
+            theta -= 0.1;
+            cameraLookAtX = cameraX + sin(theta);
+            cameraLookAtZ = cameraZ - cos(theta);
             break;
         case 's':
             cameraZ += 0.1;
             break;
         case 'd':
-            cameraLookAtX += 0.1;
+            theta += 0.1;
+            cameraLookAtX = cameraX + sin(theta);
+            cameraLookAtZ = cameraZ - cos(theta);
             break;
         default:
             break;
