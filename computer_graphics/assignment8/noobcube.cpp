@@ -23,17 +23,20 @@ void drawCuboid(float centerX, float centerY, float centerZ, float l, float b, f
     for (int i = 0; i < 6; i++) {
         glBegin(GL_QUADS);
         for (int j = 0; j < 4; j++) {
-            // cout << "[";
-            // for (auto k : walls[i][j]) {
-            //     cout << k << " ";
-            // }
-            // cout << "],";
             glVertex3fv(walls[i][j]);
         }
-        // cout << endl;
         glEnd();
     }
-    // cout << "\n";
+}
+
+void drawDoor() {
+    drawCuboid(0, -0.35, 2, 1.36, wallWidth, 1.7);
+    glPushMatrix();
+    glColor3f(1, 0, 1);
+    glTranslatef(-0.5, -0.3, 2);
+    glutSolidSphere(0.12, 10, 10);
+    glTranslatef(0.5, 0.3, -2);
+    glPopMatrix();
 }
 
 void display(void) {
@@ -44,18 +47,19 @@ void display(void) {
     glLoadIdentity();
     gluLookAt(cameraX, cameraY, cameraZ, cameraLookAtX, cameraLookAtY, cameraLookAtZ, 0, 1, 0);
 
-    // drawCuboid(0, 0, 2, 4, wallWidth, 2);     // front
     double x = -4.0 / 2.8;
     glColor3f(0.2, 0.7, 0.1);
     drawCuboid(x, 0, 2, x, wallWidth, 2);
     drawCuboid(-x, 0, 2, x, wallWidth, 2);
     drawCuboid(0, 0.75, 2, 3, wallWidth, 0.5);
 
+    // door
     glPushMatrix();
-    glColor3f(0.8, 0.7, 0.8);  // door
+    glColor3f(0.8, 0.7, 0.8);
+    glTranslatef(0.68, -1.2, 2.0);
     glRotatef(gateAngle, 0, 1, 0);
-    drawCuboid(0, -0.35, 2, 1.36, wallWidth, 1.7);
-    glLoadIdentity();
+    glTranslatef(-0.68, 1.2, -2.0);
+    drawDoor();
     glPopMatrix();
 
     glColor3f(0.2, 0.7, 0.1);
@@ -167,10 +171,12 @@ void keyboard(unsigned char key, int x, int y) {
             cameraLookAtZ = 0;
             break;
         case 'r':
-            gateAngle += 1;
+            gateAngle += 10;
+            if (gateAngle >= 90) gateAngle = 90;
             break;
         case 'R':
-            gateAngle -= 1;
+            gateAngle -= 10;
+            if (gateAngle <= 0) gateAngle = 0;
             break;
         default:
             break;
