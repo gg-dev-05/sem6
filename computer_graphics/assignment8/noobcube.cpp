@@ -16,33 +16,42 @@ void display(void) {
     glLoadIdentity();
     gluLookAt(cameraX, cameraY, cameraZ, cameraLookAtX, cameraLookAtY, cameraLookAtZ, 0, 1, 0);
 
-    float face[6][4][3] = {
-        {{-1, -1, 1}, {1, -1, 1}, {1, 1, 1}, {-1, 1, 1}},
-        {{-1, 1, -1}, {1, 1, -1}, {1, -1, -1}, {-1, -1, -1}},
-        {{1, -1, 1}, {1, -1, -1}, {1, 1, -1}, {1, 1, 1}},
-        {{-1, -1, 1}, {-1, 1, 1}, {-1, 1, -1}, {-1, -1, -1}},
-        {{-1, 1, 1}, {1, 1, 1}, {1, 1, -1}, {-1, 1, -1}},
-        {{-1, -1, 1}, {-1, -1, -1}, {1, -1, -1}, {1, -1, 1}}};
+    float walls[6][4][3] = {
+        {{-2, -1, 2}, {2, -1, 2}, {2, 1, 2}, {-2, 1, 2}},
+        {{-2, 1, -2}, {2, 1, -2}, {2, -1, -2}, {-2, -1, -2}},
+        {{2, -1, 2}, {2, -1, -2}, {2, 1, -2}, {2, 1, 2}},
+        {{-2, -1, 2}, {-2, 1, 2}, {-2, 1, -2}, {-2, -1, -2}},
+        {{-2, 1, 2}, {2, 1, 2}, {2, 1, -2}, {-2, 1, -2}},
+        {{-2, -1, 2}, {-2, -1, -2}, {2, -1, -2}, {2, -1, 2}}};
 
-    glColor3f(1, 1, 1);
-    glBegin(GL_LINES);
-    glVertex3f(-1000, -1, 1);
-    glVertex3f(1000, -1, 1);
-    glVertex3f(-1000, -1, -1);
-    glVertex3f(1000, -1, -1);
-    glEnd();
+    float roof[4][3][3] = {
+        {{-2, 1, 2}, {2, 1, 2}, {0, 3, 0}},
+        {{2, 1, 2}, {2, 1, -2}, {0, 3, 0}},
+        {{-2, 1, -2}, {2, 1, -2}, {0, 3, 0}},
+        {{-2, 1, 2}, {-2, 1, -2}, {0, 3, 0}},
+    };
+    // glBegin(GL_LINES);
+    // glVertex3f(-1000, -1, 1);
+    // glVertex3f(1000, -1, 1);
+    // glVertex3f(-1000, -1, -1);
+    // glVertex3f(1000, -1, -1);
+    // glEnd();
     for (int i = 0; i < 6; i++) {
         glBegin(GL_QUADS);
-        glColor3f(1, 0, 0);
-        glVertex3fv(face[i][0]);
-        glColor3f(0, 1, 0);
-        glVertex3fv(face[i][1]);
-        glColor3f(0, 0, 1);
-        glVertex3fv(face[i][2]);
-        glColor3f(1, 0, 1);
-        glVertex3fv(face[i][3]);
+        for (int j = 0; j < 4; j++) {
+            glVertex3fv(walls[i][j]);
+        }
         glEnd();
     }
+
+    for (int i = 0; i < 4; i++) {
+        glBegin(GL_TRIANGLES);
+        for (int j = 0; j < 3; j++) {
+            glVertex3fv(roof[i][j]);
+        }
+        glEnd();
+    }
+
     glFlush();
     glutSwapBuffers();
 }
@@ -62,11 +71,25 @@ double modValue(double x, double y, double z) {
 }
 
 void mousePress(int button, int state, int x, int y) {
-    if ((button == 3 || button == 4) && state == GLUT_DOWN) {
-        speed += (button == 3 ? 0.01 : -0.01);
+    if (state == GLUT_DOWN) {
+        if (button == GLUT_LEFT_BUTTON) {
+            speed += 0.01;
+            cout << "MOVEMENT SPEED INCREASED\n";
+        }
+        if (button == GLUT_RIGHT_BUTTON) {
+            speed -= 0.01;
+            cout << "MOVEMENT SPEED DECREASED\n";
+        }
         if (speed <= 0) speed = 0.01;
         if (speed >= 1) speed = 0.99;
-        glutPostRedisplay();
+        if (button == 3 || button == 4) {
+            int sign = (button == 3 ? 1 : -1);
+            cameraX += sign * speed * sin(theta);
+            cameraZ -= sign * speed * cos(theta);
+            cameraLookAtX += sign * speed * sin(theta);
+            cameraLookAtZ -= sign * speed * cos(theta);
+            glutPostRedisplay();
+        }
     }
 }
 
@@ -106,7 +129,6 @@ int main(int argc, char *argv[]) {
     glutInitWindowSize(WIDTH, HEIGHT);
     glutCreateWindow("BOX");
     glutDisplayFunc(display);
-    // glutIdleFunc(display);
     glutReshapeFunc(reshape);
     glutMouseFunc(mousePress);
     glutKeyboardFunc(keyboard);

@@ -23,14 +23,19 @@ double rotateY = 0;
 double XDiff = 0.0f;
 double YDiff = 0.0f;
 
+double cameraX = 0, cameraY = 0, cameraZ = 10;
+double cameraLookAtX = 0, cameraLookAtY = 0, cameraLookAtZ = 0;
+double theta = 0;
+double speed = 0.1;
 // handle window resize match the aspect ratio
 void handleResize(int width, int height) {
     glViewport(0, 0, width, height);
-
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     float aspectRatio = (double)width / (double)height;
     gluPerspective(PERSPECTIVE, aspectRatio, NEARZ, FARZ);
+    glLoadIdentity();
+    gluLookAt(cameraX, cameraY, cameraZ, cameraLookAtX, cameraLookAtY, cameraLookAtZ, 0, 1, 0);
 }
 
 // draw the hut
