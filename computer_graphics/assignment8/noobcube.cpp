@@ -7,15 +7,13 @@ using namespace std;
 double cameraX = 0, cameraY = 0, cameraZ = 5;
 double cameraLookAtX = 0, cameraLookAtY = 0, cameraLookAtZ = 0;
 double theta = 0;
+double speed = 0.1;
 void display(void) {
-    // cameraLookAtX += cameraX;
-    // cameraLookAtY += cameraY;
-    // cameraLookAtZ += cameraZ;
+    // cout << "Camera: " << cameraX << " " << cameraZ << endl;
+    // cout << "LookAt: " << cameraLookAtX << " " << cameraLookAtZ << endl;
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     glLoadIdentity();
-    cout << "Cam: " << cameraX << " " << cameraZ << endl;
-    cout << "Look At: " << cameraLookAtX << " " << cameraLookAtZ << endl;
     gluLookAt(cameraX, cameraY, cameraZ, cameraLookAtX, cameraLookAtY, cameraLookAtZ, 0, 1, 0);
 
     float face[6][4][3] = {
@@ -26,6 +24,7 @@ void display(void) {
         {{-1, 1, 1}, {1, 1, 1}, {1, 1, -1}, {-1, 1, -1}},
         {{-1, -1, 1}, {-1, -1, -1}, {1, -1, -1}, {1, -1, 1}}};
 
+    glColor3f(1, 1, 1);
     glBegin(GL_LINES);
     glVertex3f(-1000, -1, 1);
     glVertex3f(1000, -1, 1);
@@ -34,9 +33,13 @@ void display(void) {
     glEnd();
     for (int i = 0; i < 6; i++) {
         glBegin(GL_QUADS);
+        glColor3f(1, 0, 0);
         glVertex3fv(face[i][0]);
+        glColor3f(0, 1, 0);
         glVertex3fv(face[i][1]);
+        glColor3f(0, 0, 1);
         glVertex3fv(face[i][2]);
+        glColor3f(1, 0, 1);
         glVertex3fv(face[i][3]);
         glEnd();
     }
@@ -59,14 +62,10 @@ double modValue(double x, double y, double z) {
 }
 
 void mousePress(int button, int state, int x, int y) {
-    if (button == 3 || button == 4) {
-        double valC = 1 + (button == 3 ? -1 : 1) * (double)1 / (10 * modValue(cameraX, cameraY, cameraZ));
-        cameraX *= valC;
-        cameraY *= valC;
-        cameraZ *= valC;
-        glMatrixMode(GL_MODELVIEW);
-        glLoadIdentity();
-        gluLookAt(cameraX, cameraY, cameraZ, cameraLookAtX, cameraLookAtY, cameraLookAtZ, 0, 1, 0);
+    if ((button == 3 || button == 4) && state == GLUT_DOWN) {
+        speed += (button == 3 ? 0.01 : -0.01);
+        if (speed <= 0) speed = 0.01;
+        if (speed >= 1) speed = 0.99;
         glutPostRedisplay();
     }
 }
@@ -74,18 +73,24 @@ void mousePress(int button, int state, int x, int y) {
 void keyboard(unsigned char key, int x, int y) {
     switch (key) {
         case 'w':
-            cameraZ -= 0.1;
+            cameraX += speed * sin(theta);
+            cameraZ -= speed * cos(theta);
+            cameraLookAtX += speed * sin(theta);
+            cameraLookAtZ -= speed * cos(theta);
+            break;
+        case 's':
+            cameraX -= speed * sin(theta);
+            cameraZ += speed * cos(theta);
+            cameraLookAtX += speed * sin(theta);
+            cameraLookAtZ -= speed * cos(theta);
             break;
         case 'a':
-            theta -= 0.1;
+            theta -= speed;
             cameraLookAtX = cameraX + sin(theta);
             cameraLookAtZ = cameraZ - cos(theta);
             break;
-        case 's':
-            cameraZ += 0.1;
-            break;
         case 'd':
-            theta += 0.1;
+            theta += speed;
             cameraLookAtX = cameraX + sin(theta);
             cameraLookAtZ = cameraZ - cos(theta);
             break;
