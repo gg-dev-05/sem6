@@ -5,10 +5,18 @@ using namespace std;
 #define WIDTH 500
 #define HEIGHT 500
 double cameraX = 0, cameraY = 0, cameraZ = 5;
+double cameraLookAtX = 0, cameraLookAtY = 0, cameraLookAtZ = 0;
 void display(void) {
+    // cameraLookAtX += cameraX;
+    // cameraLookAtY += cameraY;
+    // cameraLookAtZ += cameraZ;
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    // glLoadIdentity();
+    glLoadIdentity();
+    cout << "Cam: " << cameraX << " " << cameraZ << endl;
+    cout << "Look At: " << cameraLookAtX << " " << cameraLookAtZ << endl;
+    gluLookAt(cameraX, cameraY, cameraZ, cameraLookAtX, cameraLookAtY, cameraLookAtZ, 0, 1, 0);
+
     float face[6][4][3] = {
         {{-1, -1, 1}, {1, -1, 1}, {1, 1, 1}, {-1, 1, 1}},
         {{-1, 1, -1}, {1, 1, -1}, {1, -1, -1}, {-1, -1, -1}},
@@ -17,6 +25,12 @@ void display(void) {
         {{-1, 1, 1}, {1, 1, 1}, {1, 1, -1}, {-1, 1, -1}},
         {{-1, -1, 1}, {-1, -1, -1}, {1, -1, -1}, {1, -1, 1}}};
 
+    glBegin(GL_LINES);
+    glVertex3f(-1000, -1, 1);
+    glVertex3f(1000, -1, 1);
+    glVertex3f(-1000, -1, -1);
+    glVertex3f(1000, -1, -1);
+    glEnd();
     for (int i = 0; i < 6; i++) {
         glBegin(GL_QUADS);
         glVertex3fv(face[i][0]);
@@ -36,7 +50,7 @@ void reshape(int w, int h) {
     gluPerspective(60, (GLfloat)w / (GLfloat)h, 0.0001, 200);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    gluLookAt(cameraX, cameraY, cameraZ, 0, 0, 0, 0, 1, 0);
+    gluLookAt(cameraX, cameraY, cameraZ, cameraLookAtX, cameraLookAtY, cameraLookAtZ, 0, 1, 0);
 }
 
 double modValue(double x, double y, double z) {
@@ -51,19 +65,29 @@ void mousePress(int button, int state, int x, int y) {
         cameraZ *= valC;
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
-        gluLookAt(cameraX, cameraY, cameraZ, 0, 0, 0, 0, 1, 0);
+        gluLookAt(cameraX, cameraY, cameraZ, cameraLookAtX, cameraLookAtY, cameraLookAtZ, 0, 1, 0);
         glutPostRedisplay();
     }
 }
 
 void keyboard(unsigned char key, int x, int y) {
-    // switch (key) {
-    //     case 'a':
-    //         break;
-
-    //     default:
-    //         break;
-    // }
+    switch (key) {
+        case 'w':
+            cameraZ -= 0.1;
+            break;
+        case 'a':
+            cameraLookAtX -= 0.1;
+            break;
+        case 's':
+            cameraZ += 0.1;
+            break;
+        case 'd':
+            cameraLookAtX += 0.1;
+            break;
+        default:
+            break;
+    }
+    glutPostRedisplay();
 }
 
 int main(int argc, char *argv[]) {
