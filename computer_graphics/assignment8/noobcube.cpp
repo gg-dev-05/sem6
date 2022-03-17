@@ -4,25 +4,44 @@ using namespace std;
 
 #define WIDTH 500
 #define HEIGHT 500
+float wallWidth = 0.2;
 double cameraX = 0, cameraY = 0, cameraZ = 5;
 double cameraLookAtX = 0, cameraLookAtY = 0, cameraLookAtZ = 0;
 double theta = 0;
 double speed = 0.1;
+
+void drawCuboid(float centerX, float centerY, float centerZ, float l, float b, float h) {
+    float walls[6][4][3] = {
+        {{centerX - l / (float)2.0, centerY - h / (float)2.0, centerZ + b / (float)2.0}, {centerX + l / (float)2.0, centerY - h / (float)2.0, centerZ + b / (float)2.0}, {centerX + l / (float)2.0, centerY + h / (float)2.0, centerZ + b / (float)2.0}, {centerX - l / (float)2.0, centerY + h / (float)2.0, centerZ + b / (float)2.0}},
+        {{centerX - l / (float)2.0, centerY + h / (float)2.0, centerZ - b / (float)2.0}, {centerX + l / (float)2.0, centerY + h / (float)2.0, centerZ - b / (float)2.0}, {centerX + l / (float)2.0, centerY - h / (float)2.0, centerZ - b / (float)2.0}, {centerX - l / (float)2.0, centerY - h / (float)2.0, centerZ - b / (float)2.0}},
+        {{centerX + l / (float)2.0, centerY - h / (float)2.0, centerZ + b / (float)2.0}, {centerX + l / (float)2.0, centerY - h / (float)2.0, centerZ - b / (float)2.0}, {centerX + l / (float)2.0, centerY + h / (float)2.0, centerZ - b / (float)2.0}, {centerX + l / (float)2.0, centerY + h / (float)2.0, centerZ + b / (float)2.0}},
+        {{centerX - l / (float)2.0, centerY - h / (float)2.0, centerZ + b / (float)2.0}, {centerX - l / (float)2.0, centerY + h / (float)2.0, centerZ + b / (float)2.0}, {centerX - l / (float)2.0, centerY + h / (float)2.0, centerZ - b / (float)2.0}, {centerX - l / (float)2.0, centerY - h / (float)2.0, centerZ - b / (float)2.0}},
+        {{centerX - l / (float)2.0, centerY + h / (float)2.0, centerZ + b / (float)2.0}, {centerX + l / (float)2.0, centerY + h / (float)2.0, centerZ + b / (float)2.0}, {centerX + l / (float)2.0, centerY + h / (float)2.0, centerZ - b / (float)2.0}, {centerX - l / (float)2.0, centerY + h / (float)2.0, centerZ - b / (float)2.0}},
+        {{centerX - l / (float)2.0, centerY - h / (float)2.0, centerZ + b / (float)2.0}, {centerX - l / (float)2.0, centerY - h / (float)2.0, centerZ - b / (float)2.0}, {centerX + l / (float)2.0, centerY - h / (float)2.0, centerZ - b / (float)2.0}, {centerX + l / (float)2.0, centerY - h / (float)2.0, centerZ + b / (float)2.0}}};
+
+    for (int i = 0; i < 6; i++) {
+        glColor3f(0.2, 0.5 * i, 0.6);
+        glBegin(GL_QUADS);
+        for (int j = 0; j < 4; j++) {
+            glVertex3fv(walls[i][j]);
+        }
+        glEnd();
+    }
+}
+
 void display(void) {
     // cout << "Camera: " << cameraX << " " << cameraZ << endl;
     // cout << "LookAt: " << cameraLookAtX << " " << cameraLookAtZ << endl;
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     glLoadIdentity();
     gluLookAt(cameraX, cameraY, cameraZ, cameraLookAtX, cameraLookAtY, cameraLookAtZ, 0, 1, 0);
 
-    float walls[6][4][3] = {
-        {{-2, -1, 2}, {2, -1, 2}, {2, 1, 2}, {-2, 1, 2}},
-        {{-2, 1, -2}, {2, 1, -2}, {2, -1, -2}, {-2, -1, -2}},
-        {{2, -1, 2}, {2, -1, -2}, {2, 1, -2}, {2, 1, 2}},
-        {{-2, -1, 2}, {-2, 1, 2}, {-2, 1, -2}, {-2, -1, -2}},
-        {{-2, 1, 2}, {2, 1, 2}, {2, 1, -2}, {-2, 1, -2}},
-        {{-2, -1, 2}, {-2, -1, -2}, {2, -1, -2}, {2, -1, 2}}};
+    drawCuboid(0, 0, 2, 4, wallWidth, 2);   // front
+    drawCuboid(0, 0, -2, 4, wallWidth, 2);  // back
+    drawCuboid(-2, 0, 0, wallWidth, 4, 2);  // left
+    drawCuboid(2, 0, 0, wallWidth, 4, 2);   // right
+    drawCuboid(0, -1, 0, 4, 4, wallWidth);
 
     float roof[4][3][3] = {
         {{-2, 1, 2}, {2, 1, 2}, {0, 3, 0}},
@@ -30,22 +49,10 @@ void display(void) {
         {{-2, 1, -2}, {2, 1, -2}, {0, 3, 0}},
         {{-2, 1, 2}, {-2, 1, -2}, {0, 3, 0}},
     };
-    // glBegin(GL_LINES);
-    // glVertex3f(-1000, -1, 1);
-    // glVertex3f(1000, -1, 1);
-    // glVertex3f(-1000, -1, -1);
-    // glVertex3f(1000, -1, -1);
-    // glEnd();
-    for (int i = 0; i < 6; i++) {
-        glBegin(GL_QUADS);
-        for (int j = 0; j < 4; j++) {
-            glVertex3fv(walls[i][j]);
-        }
-        glEnd();
-    }
 
     for (int i = 0; i < 4; i++) {
         glBegin(GL_TRIANGLES);
+        glColor3f(0.2, 0.5 * i, 0.2);
         for (int j = 0; j < 3; j++) {
             glVertex3fv(roof[i][j]);
         }
@@ -128,6 +135,7 @@ int main(int argc, char *argv[]) {
     glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
     glutInitWindowSize(WIDTH, HEIGHT);
     glutCreateWindow("BOX");
+    glEnable(GL_DEPTH_TEST);
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
     glutMouseFunc(mousePress);
