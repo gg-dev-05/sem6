@@ -5,6 +5,7 @@ using namespace std;
 #define WIDTH 500
 #define HEIGHT 500
 float wallWidth = 0.2;
+float gateAngle = 0;
 double cameraX = 0, cameraY = 0, cameraZ = 5;
 double cameraLookAtX = 0, cameraLookAtY = 0, cameraLookAtZ = 0;
 double theta = 0;
@@ -20,13 +21,19 @@ void drawCuboid(float centerX, float centerY, float centerZ, float l, float b, f
         {{centerX - l / (float)2.0, centerY - h / (float)2.0, centerZ + b / (float)2.0}, {centerX - l / (float)2.0, centerY - h / (float)2.0, centerZ - b / (float)2.0}, {centerX + l / (float)2.0, centerY - h / (float)2.0, centerZ - b / (float)2.0}, {centerX + l / (float)2.0, centerY - h / (float)2.0, centerZ + b / (float)2.0}}};
 
     for (int i = 0; i < 6; i++) {
-        glColor3f(0.2, 0.5 * i, 0.6);
         glBegin(GL_QUADS);
         for (int j = 0; j < 4; j++) {
+            // cout << "[";
+            // for (auto k : walls[i][j]) {
+            //     cout << k << " ";
+            // }
+            // cout << "],";
             glVertex3fv(walls[i][j]);
         }
+        // cout << endl;
         glEnd();
     }
+    // cout << "\n";
 }
 
 void display(void) {
@@ -37,11 +44,26 @@ void display(void) {
     glLoadIdentity();
     gluLookAt(cameraX, cameraY, cameraZ, cameraLookAtX, cameraLookAtY, cameraLookAtZ, 0, 1, 0);
 
-    drawCuboid(0, 0, 2, 4, wallWidth, 2);   // front
+    // drawCuboid(0, 0, 2, 4, wallWidth, 2);     // front
+    double x = -4.0 / 2.8;
+    glColor3f(0.2, 0.7, 0.1);
+    drawCuboid(x, 0, 2, x, wallWidth, 2);
+    drawCuboid(-x, 0, 2, x, wallWidth, 2);
+    drawCuboid(0, 0.75, 2, 3, wallWidth, 0.5);
+
+    glPushMatrix();
+    glColor3f(0.8, 0.7, 0.8);  // door
+    glRotatef(gateAngle, 0, 1, 0);
+    drawCuboid(0, -0.35, 2, 1.36, wallWidth, 1.7);
+    glLoadIdentity();
+    glPopMatrix();
+
+    glColor3f(0.2, 0.7, 0.1);
     drawCuboid(0, 0, -2, 4, wallWidth, 2);  // back
     drawCuboid(-2, 0, 0, wallWidth, 4, 2);  // left
     drawCuboid(2, 0, 0, wallWidth, 4, 2);   // right
-    drawCuboid(0, -1, 0, 4, 4, wallWidth);
+    glColor3f(0.3, 0.1, 0.5);
+    drawCuboid(0, -1.1, 0, 8, 8, wallWidth);  // bottom
 
     float roof[4][3][3] = {
         {{-2, 1, 2}, {2, 1, 2}, {0, 3, 0}},
@@ -123,6 +145,32 @@ void keyboard(unsigned char key, int x, int y) {
             theta += speed;
             cameraLookAtX = cameraX + sin(theta);
             cameraLookAtZ = cameraZ - cos(theta);
+            break;
+        case '[':
+            cameraY += 0.1;
+            cameraLookAtY += 0.1;
+            break;
+        case ']':
+            cameraY -= 0.1;
+            cameraLookAtY -= 0.1;
+            break;
+        case 'z':
+            cameraX = 0;
+            cameraLookAtX = 0;
+            break;
+        case 'x':
+            cameraY = 0;
+            cameraLookAtY = 0;
+            break;
+        case 'c':
+            cameraZ = 0;
+            cameraLookAtZ = 0;
+            break;
+        case 'r':
+            gateAngle += 1;
+            break;
+        case 'R':
+            gateAngle -= 1;
             break;
         default:
             break;
