@@ -120,14 +120,6 @@ void mousePress(int button, int state, int x, int y) {
         // }
         // if (speed <= 0) speed = 0.01;
         // if (speed >= 1) speed = 0.99;
-        if (button == 3 || button == 4) {
-            int sign = (button == 3 ? 1 : -1);
-            cameraX += sign * speed * sin(theta);
-            cameraZ -= sign * speed * cos(theta);
-            cameraLookAtX += sign * speed * sin(theta);
-            cameraLookAtZ -= sign * speed * cos(theta);
-            glutPostRedisplay();
-        }
     }
 }
 
@@ -183,9 +175,6 @@ void keyboard(unsigned char key, int x, int y) {
             gateAngle -= 10;
             if (gateAngle <= 0) gateAngle = 0;
             break;
-        case 'b':
-            theta = 0;
-            break;
         default:
             break;
     }
@@ -200,9 +189,19 @@ void mouseMotion(int currX, int currY) {
 }
 
 void handleMouse(int button, int state, int currX, int currY) {
-    if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
-        isLMBPressed = true;
-        xDiff = currX - rotateY;
+    if (state == GLUT_DOWN) {
+        if (button == 3 || button == 4) {
+            int sign = (button == 3 ? 1 : -1);
+            cameraX += sign * speed * sin(theta);
+            cameraZ -= sign * speed * cos(theta);
+            cameraLookAtX += sign * speed * sin(theta);
+            cameraLookAtZ -= sign * speed * cos(theta);
+            glutPostRedisplay();
+        }
+        if (button == GLUT_LEFT_BUTTON) {
+            isLMBPressed = true;
+            xDiff = currX - rotateY;
+        }
     } else {
         isLMBPressed = false;
     }
