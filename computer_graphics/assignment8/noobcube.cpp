@@ -4,6 +4,8 @@ using namespace std;
 
 #define WIDTH 500
 #define HEIGHT 500
+
+bool LINE_MODE = true;
 float wallWidth = 0.2;
 float gateAngle = 0;
 double cameraX = 0, cameraY = 0, cameraZ = 5;
@@ -47,7 +49,12 @@ void display(void) {
     // cout << "Camera: " << cameraX << " " << cameraZ << endl;
     // cout << "LookAt: " << cameraLookAtX << " " << cameraLookAtZ << endl;
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    // glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+    if (LINE_MODE == 0)
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    else
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
     glLoadIdentity();
     gluLookAt(cameraX, cameraY, cameraZ, cameraLookAtX, cameraLookAtY, cameraLookAtZ, 0, 1, 0);
 
@@ -106,21 +113,6 @@ void reshape(int w, int h) {
 
 double modValue(double x, double y, double z) {
     return sqrt(x * x + y * y + z * z);
-}
-
-void mousePress(int button, int state, int x, int y) {
-    if (state == GLUT_DOWN) {
-        // if (button == GLUT_LEFT_BUTTON) {
-        //     speed += 0.01;
-        //     cout << "MOVEMENT SPEED INCREASED\n";
-        // }
-        // if (button == GLUT_RIGHT_BUTTON) {
-        //     speed -= 0.01;
-        //     cout << "MOVEMENT SPEED DECREASED\n";
-        // }
-        // if (speed <= 0) speed = 0.01;
-        // if (speed >= 1) speed = 0.99;
-    }
 }
 
 void keyboard(unsigned char key, int x, int y) {
@@ -201,6 +193,10 @@ void handleMouse(int button, int state, int currX, int currY) {
         if (button == GLUT_LEFT_BUTTON) {
             isLMBPressed = true;
             xDiff = currX - rotateY;
+        }
+        if (button == GLUT_RIGHT_BUTTON) {
+            LINE_MODE = !LINE_MODE;
+            glutPostRedisplay();
         }
     } else {
         isLMBPressed = false;
