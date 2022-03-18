@@ -29,10 +29,17 @@ void drawCuboid(float centerX, float centerY, float centerZ, float l, float b, f
     for (int i = 0; i < 6; i++) {
         glBegin(GL_QUADS);
         for (int j = 0; j < 4; j++) {
+            cout << "[";
+            for (auto k : walls[i][j]) {
+                cout << k << ",";
+            }
+            cout << "] ";
             glVertex3fv(walls[i][j]);
         }
+        cout << endl;
         glEnd();
     }
+    cout << endl;
 }
 
 void drawDoor() {
@@ -80,6 +87,34 @@ void display(void) {
     drawCuboid(2, 0, 0, wallWidth, 4, 2);   // right
     glColor3f(0.3, 0.1, 0.5);
     drawCuboid(0, -1.1, 0, 8, 8, wallWidth);  // bottom
+
+    cout << "FURNITURE\n";
+    glPushMatrix();
+    // glTranslatef(-1, 0, -1);
+    glColor3f(0.6, 0.1, 0.6);
+    drawCuboid(0, -0.5, 0, 2, 2, 0.1);
+
+    glPushMatrix();
+    glTranslatef(-1, 0, -1);
+    drawCuboid(0, -0.75, 0, 0.1, 0.1, 0.5);
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(1, 0, -1);
+    drawCuboid(0, -0.75, 0, 0.1, 0.1, 0.5);
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(-1, 0, 1);
+    drawCuboid(0, -0.75, 0, 0.1, 0.1, 0.5);
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(1, 0, 1);
+    drawCuboid(0, -0.75, 0, 0.1, 0.1, 0.5);
+    glPopMatrix();
+
+    glPopMatrix();
 
     float roof[4][3][3] = {
         {{-2, 1, 2}, {2, 1, 2}, {0, 3, 0}},
