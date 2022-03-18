@@ -17,7 +17,7 @@ bool isLMBPressed = false;
 double rotateY = 0;
 double xDiff = 0.0f;
 
-void drawCuboid(float centerX, float centerY, float centerZ, float l, float b, float h, bool debug = false) {
+void drawCuboid(float centerX, float centerY, float centerZ, float l, float b, float h) {
     float walls[6][4][3] = {
         {{centerX - l / (float)2.0, centerY - h / (float)2.0, centerZ + b / (float)2.0}, {centerX + l / (float)2.0, centerY - h / (float)2.0, centerZ + b / (float)2.0}, {centerX + l / (float)2.0, centerY + h / (float)2.0, centerZ + b / (float)2.0}, {centerX - l / (float)2.0, centerY + h / (float)2.0, centerZ + b / (float)2.0}},
         {{centerX - l / (float)2.0, centerY + h / (float)2.0, centerZ - b / (float)2.0}, {centerX + l / (float)2.0, centerY + h / (float)2.0, centerZ - b / (float)2.0}, {centerX + l / (float)2.0, centerY - h / (float)2.0, centerZ - b / (float)2.0}, {centerX - l / (float)2.0, centerY - h / (float)2.0, centerZ - b / (float)2.0}},
@@ -29,22 +29,9 @@ void drawCuboid(float centerX, float centerY, float centerZ, float l, float b, f
     for (int i = 0; i < 6; i++) {
         glBegin(GL_QUADS);
         for (int j = 0; j < 4; j++) {
-            if (debug) {
-                cout << "[";
-                for (auto k : walls[i][j]) {
-                    cout << k << ",";
-                }
-                cout << "] ";
-            }
             glVertex3fv(walls[i][j]);
         }
-        if (debug) {
-            cout << endl;
-        }
         glEnd();
-    }
-    if (debug) {
-        cout << endl;
     }
 }
 
@@ -195,16 +182,6 @@ void keyboard(unsigned char key, int x, int y) {
             cameraLookAtX += speed * sin(theta);
             cameraLookAtZ -= speed * cos(theta);
             break;
-        case 'a':
-            theta -= speed;
-            cameraLookAtX = cameraX + sin(theta);
-            cameraLookAtZ = cameraZ - cos(theta);
-            break;
-        case 'd':
-            theta += speed;
-            cameraLookAtX = cameraX + sin(theta);
-            cameraLookAtZ = cameraZ - cos(theta);
-            break;
         case '[':
             cameraY += 0.1;
             cameraLookAtY += 0.1;
@@ -212,18 +189,6 @@ void keyboard(unsigned char key, int x, int y) {
         case ']':
             cameraY -= 0.1;
             cameraLookAtY -= 0.1;
-            break;
-        case 'z':
-            cameraX = 0;
-            cameraLookAtX = 0;
-            break;
-        case 'x':
-            cameraY = 0;
-            cameraLookAtY = 0;
-            break;
-        case 'c':
-            cameraZ = 0;
-            cameraLookAtZ = 0;
             break;
         case 'r':
             gateAngle += 10;
@@ -233,6 +198,8 @@ void keyboard(unsigned char key, int x, int y) {
             gateAngle -= 10;
             if (gateAngle <= 0) gateAngle = 0;
             break;
+        case 27:
+            exit(0);
         default:
             break;
     }
@@ -270,17 +237,17 @@ void handleMouse(int button, int state, int currX, int currY) {
 }
 
 int main(int argc, char *argv[]) {
+    cout << "W => FORWARD\nS => BACKWARD\n[ => UP\n] => DOWN\nr => OPEN GATE/WINDOW\nR => CLOSE GATE/WINDOW\nMOUSE => ROTATE VIEW\nESC => EXIT\n";
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
     glutInitWindowSize(WIDTH, HEIGHT);
-    glutCreateWindow("BOX");
+    glutCreateWindow("");
     glEnable(GL_DEPTH_TEST);
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
 
     glutMouseFunc(handleMouse);
     glutMotionFunc(mouseMotion);
-    // glutPassiveMotionFunc(mouse);
     glutKeyboardFunc(keyboard);
     glutMainLoop();
     return 0;
