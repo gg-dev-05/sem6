@@ -17,7 +17,7 @@ bool isLMBPressed = false;
 double rotateY = 0;
 double xDiff = 0.0f;
 
-void drawCuboid(float centerX, float centerY, float centerZ, float l, float b, float h) {
+void drawCuboid(float centerX, float centerY, float centerZ, float l, float b, float h, bool debug = false) {
     float walls[6][4][3] = {
         {{centerX - l / (float)2.0, centerY - h / (float)2.0, centerZ + b / (float)2.0}, {centerX + l / (float)2.0, centerY - h / (float)2.0, centerZ + b / (float)2.0}, {centerX + l / (float)2.0, centerY + h / (float)2.0, centerZ + b / (float)2.0}, {centerX - l / (float)2.0, centerY + h / (float)2.0, centerZ + b / (float)2.0}},
         {{centerX - l / (float)2.0, centerY + h / (float)2.0, centerZ - b / (float)2.0}, {centerX + l / (float)2.0, centerY + h / (float)2.0, centerZ - b / (float)2.0}, {centerX + l / (float)2.0, centerY - h / (float)2.0, centerZ - b / (float)2.0}, {centerX - l / (float)2.0, centerY - h / (float)2.0, centerZ - b / (float)2.0}},
@@ -29,17 +29,23 @@ void drawCuboid(float centerX, float centerY, float centerZ, float l, float b, f
     for (int i = 0; i < 6; i++) {
         glBegin(GL_QUADS);
         for (int j = 0; j < 4; j++) {
-            // cout << "[";
-            // for (auto k : walls[i][j]) {
-            //     cout << k << ",";
-            // }
-            // cout << "] ";
+            if (debug) {
+                cout << "[";
+                for (auto k : walls[i][j]) {
+                    cout << k << ",";
+                }
+                cout << "] ";
+            }
             glVertex3fv(walls[i][j]);
         }
-        // cout << endl;
+        if (debug) {
+            cout << endl;
+        }
         glEnd();
     }
-    // cout << endl;
+    if (debug) {
+        cout << endl;
+    }
 }
 
 void drawDoor() {
@@ -115,14 +121,16 @@ void wallWithWindow() {
     drawCuboid(2, -0.75, 0, wallWidth, 3, 0.5);
 
     glColor3f(0.7, 0.2, 0.1);
-    // left pane
-    drawCuboid(2, 0, 0.17, wallWidth, 0.55, 1);
-    drawCuboid(2, 0, -0.45, wallWidth, 0.55, 1);
+
+    glPushMatrix();
+    glTranslatef(2.1, -0.5, 0.445);
+    glRotatef(-gateAngle, 0, 1, 0);
+    glTranslatef(-2.1, 0.5, -0.445);
+    drawCuboid(2, 0, -0.1, wallWidth, 1.2, 1);
+    glPopMatrix();
 }
 
 void display(void) {
-    // cout << "Camera: " << cameraX << " " << cameraZ << endl;
-    // cout << "LookAt: " << cameraLookAtX << " " << cameraLookAtZ << endl;
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     if (LINE_MODE == 0)
@@ -171,10 +179,6 @@ void reshape(int w, int h) {
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     gluLookAt(cameraX, cameraY, cameraZ, cameraLookAtX, cameraLookAtY, cameraLookAtZ, 0, 1, 0);
-}
-
-double modValue(double x, double y, double z) {
-    return sqrt(x * x + y * y + z * z);
 }
 
 void keyboard(unsigned char key, int x, int y) {
