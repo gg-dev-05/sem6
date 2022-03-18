@@ -29,17 +29,17 @@ void drawCuboid(float centerX, float centerY, float centerZ, float l, float b, f
     for (int i = 0; i < 6; i++) {
         glBegin(GL_QUADS);
         for (int j = 0; j < 4; j++) {
-            cout << "[";
-            for (auto k : walls[i][j]) {
-                cout << k << ",";
-            }
-            cout << "] ";
+            // cout << "[";
+            // for (auto k : walls[i][j]) {
+            //     cout << k << ",";
+            // }
+            // cout << "] ";
             glVertex3fv(walls[i][j]);
         }
-        cout << endl;
+        // cout << endl;
         glEnd();
     }
-    cout << endl;
+    // cout << endl;
 }
 
 void drawDoor() {
@@ -52,48 +52,15 @@ void drawDoor() {
     glPopMatrix();
 }
 
-void display(void) {
-    // cout << "Camera: " << cameraX << " " << cameraZ << endl;
-    // cout << "LookAt: " << cameraLookAtX << " " << cameraLookAtZ << endl;
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    if (LINE_MODE == 0)
-        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    else
-        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-    glLoadIdentity();
-    gluLookAt(cameraX, cameraY, cameraZ, cameraLookAtX, cameraLookAtY, cameraLookAtZ, 0, 1, 0);
-
-    glRotatef(rotateY, 0, 1, 0);
-    double x = -4.0 / 2.8;
-    glColor3f(0.2, 0.7, 0.1);
-    drawCuboid(x, 0, 2, x, wallWidth, 2);
-    drawCuboid(-x, 0, 2, x, wallWidth, 2);
-    drawCuboid(0, 0.75, 2, 3, wallWidth, 0.5);
-
-    // door
+void drawTable() {
     glPushMatrix();
-    glColor3f(0.8, 0.7, 0.8);
-    glTranslatef(0.68, -1.2, 2.0);
-    glRotatef(gateAngle, 0, 1, 0);
-    glTranslatef(-0.68, 1.2, -2.0);
-    drawDoor();
-    glPopMatrix();
+    glTranslatef(-0.8, 0, -0.8);
 
-    glColor3f(0.2, 0.7, 0.1);
-    drawCuboid(0, 0, -2, 4, wallWidth, 2);  // back
-    drawCuboid(-2, 0, 0, wallWidth, 4, 2);  // left
-    drawCuboid(2, 0, 0, wallWidth, 4, 2);   // right
-    glColor3f(0.3, 0.1, 0.5);
-    drawCuboid(0, -1.1, 0, 8, 8, wallWidth);  // bottom
-
-    cout << "FURNITURE\n";
-    glPushMatrix();
-    // glTranslatef(-1, 0, -1);
+    // base of table
     glColor3f(0.6, 0.1, 0.6);
     drawCuboid(0, -0.5, 0, 2, 2, 0.1);
 
+    // legs
     glPushMatrix();
     glTranslatef(-1, 0, -1);
     drawCuboid(0, -0.75, 0, 0.1, 0.1, 0.5);
@@ -115,6 +82,66 @@ void display(void) {
     glPopMatrix();
 
     glPopMatrix();
+}
+
+void frontWallWithGate() {
+    double x = -4.0 / 2.8;
+    glColor3f(0.2, 0.7, 0.1);
+    drawCuboid(x, 0, 2, x, wallWidth, 2);
+    drawCuboid(-x, 0, 2, x, wallWidth, 2);
+    drawCuboid(0, 0.75, 2, 3, wallWidth, 0.5);
+
+    // door
+    glPushMatrix();
+    glColor3f(0.8, 0.7, 0.8);
+    glTranslatef(0.68, -1.2, 2.0);
+    glRotatef(gateAngle, 0, 1, 0);
+    glTranslatef(-0.68, 1.2, -2.0);
+    drawDoor();
+    glPopMatrix();
+
+    glColor3f(0.2, 0.7, 0.1);
+    drawCuboid(0, 0, -2, 4, wallWidth, 2);  // back
+    drawCuboid(-2, 0, 0, wallWidth, 4, 2);  // left
+}
+
+void wallWithWindow() {
+    // walls
+    double x = -4.0 / 2.8;
+    glColor3f(0.9, 0.7, 0.1);
+    drawCuboid(2, 0, x, wallWidth, x, 2);
+    drawCuboid(2, 0, -x - 0.25, wallWidth, x, 2);
+    drawCuboid(2, 0.75, 0, wallWidth, 3, 0.5);
+    drawCuboid(2, -0.75, 0, wallWidth, 3, 0.5);
+
+    glColor3f(0.7, 0.2, 0.1);
+    // left pane
+    drawCuboid(2, 0, 0.17, wallWidth, 0.55, 1);
+    drawCuboid(2, 0, -0.45, wallWidth, 0.55, 1);
+}
+
+void display(void) {
+    // cout << "Camera: " << cameraX << " " << cameraZ << endl;
+    // cout << "LookAt: " << cameraLookAtX << " " << cameraLookAtZ << endl;
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+    if (LINE_MODE == 0)
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    else
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+    glLoadIdentity();
+    gluLookAt(cameraX, cameraY, cameraZ, cameraLookAtX, cameraLookAtY, cameraLookAtZ, 0, 1, 0);
+    glRotatef(rotateY, 0, 1, 0);
+
+    frontWallWithGate();
+
+    wallWithWindow();
+
+    glColor3f(0.3, 0.1, 0.5);
+    drawCuboid(0, -1.1, 0, 8, 8, wallWidth);  // bottom
+
+    drawTable();
 
     float roof[4][3][3] = {
         {{-2, 1, 2}, {2, 1, 2}, {0, 3, 0}},
