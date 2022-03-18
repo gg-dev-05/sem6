@@ -10,7 +10,10 @@ double cameraX = 0, cameraY = 0, cameraZ = 5;
 double cameraLookAtX = 0, cameraLookAtY = 0, cameraLookAtZ = 0;
 double theta = 0;
 double speed = 0.1;
-int lastMousePosition = 0;
+
+bool isLMBPressed = false;
+double rotateY = 0;
+double xDiff = 0.0f;
 
 void drawCuboid(float centerX, float centerY, float centerZ, float l, float b, float h) {
     float walls[6][4][3] = {
@@ -48,6 +51,7 @@ void display(void) {
     glLoadIdentity();
     gluLookAt(cameraX, cameraY, cameraZ, cameraLookAtX, cameraLookAtY, cameraLookAtZ, 0, 1, 0);
 
+    glRotatef(rotateY, 0, 1, 0);
     double x = -4.0 / 2.8;
     glColor3f(0.2, 0.7, 0.1);
     drawCuboid(x, 0, 2, x, wallWidth, 2);
@@ -126,36 +130,6 @@ void mousePress(int button, int state, int x, int y) {
         }
     }
 }
-// // change rotatation according to mouse movement
-// // based on current position of the cursor
-// void mouseMotion(int currX, int currY) {
-//     if (isLMBPressed) {
-//         rotateX = (currY - YDiff) / 360;
-//         cameraLookAtX = cameraX + sin(rotateX);
-//         cameraLookAtZ = cameraZ - cos(rotateX);
-//         glutPostRedisplay();  // re-display
-//     }
-// }
-
-// // handle mouse keypresses
-// void handleMouse(int button, int state, int currentX, int currentY) {
-//     if (state == GLUT_DOWN) {
-//         if (button == 3 || button == 4) {
-//             int sign = (button == 3 ? 1 : -1);
-//             cameraX += sign * speed * sin(theta);
-//             cameraZ -= sign * speed * cos(theta);
-//             cameraLookAtX += sign * speed * sin(theta);
-//             cameraLookAtZ -= sign * speed * cos(theta);
-//             glutPostRedisplay();
-//         }
-//         if (button == GLUT_LEFT_BUTTON) {
-//             isLMBPressed = true;  // set LMB pressed as true
-//             XDiff = currentX - rotateY;
-//             YDiff = currentY - rotateX;
-//         }
-//     } else
-//         isLMBPressed = false;  // mouse button released or not pressed
-// }
 
 void keyboard(unsigned char key, int x, int y) {
     switch (key) {
@@ -218,21 +192,22 @@ void keyboard(unsigned char key, int x, int y) {
     glutPostRedisplay();
 }
 
-void mouse(int x, int y) {
-    if (abs(x - lastMousePosition) >= 50) {
-        lastMousePosition = x;
-        if (x > WIDTH / 2) {
-            theta -= speed;
-            cameraLookAtX = cameraX + sin(theta);
-            cameraLookAtZ = cameraZ - cos(theta);
-        } else {
-            theta += speed;
-            cameraLookAtX = cameraX + sin(theta);
-            cameraLookAtZ = cameraZ - cos(theta);
-        }
+void mouseMotion(int currX, int currY) {
+    if (isLMBPressed) {
+        rotateY = currX - xDiff;
         glutPostRedisplay();
     }
 }
+
+void handleMouse(int button, int state, int currX, int currY) {
+    if (button == GLUT_LEFT_BUTTON && state == GLUT_DOWN) {
+        isLMBPressed = true;
+        xDiff = currX - rotateY;
+    } else {
+        isLMBPressed = false;
+    }
+}
+
 int main(int argc, char *argv[]) {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
@@ -241,7 +216,10 @@ int main(int argc, char *argv[]) {
     glEnable(GL_DEPTH_TEST);
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
-    glutPassiveMotionFunc(mouse);
+
+    glutMouseFunc(handleMouse);
+    glutMotionFunc(mouseMotion);
+    // glutPassiveMotionFunc(mouse);
     glutKeyboardFunc(keyboard);
     glutMainLoop();
     return 0;
