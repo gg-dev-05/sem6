@@ -22,7 +22,7 @@ bool isLeftMouseButtonPressed = false;
 double rotationInY = 0;
 double changeInX = 0.0f;
 
-void drawCuboidAt(float centerOfCuboidX, float centerOfCuboidY, float centerOfCuboidZ, float lengthOfCubiod, float breadthOfCuboid, float heightOfCuboid) {
+void drawCuboidAt(float centerOfCuboidX, float centerOfCuboidY, float centerOfCuboidZ, float lengthOfCubiod, float breadthOfCuboid, float heightOfCuboid, bool debug = false) {
     float walls[6][4][3] = {
         {{centerOfCuboidX - lengthOfCubiod / (float)2.0, centerOfCuboidY - heightOfCuboid / (float)2.0, centerOfCuboidZ + breadthOfCuboid / (float)2.0}, {centerOfCuboidX + lengthOfCubiod / (float)2.0, centerOfCuboidY - heightOfCuboid / (float)2.0, centerOfCuboidZ + breadthOfCuboid / (float)2.0}, {centerOfCuboidX + lengthOfCubiod / (float)2.0, centerOfCuboidY + heightOfCuboid / (float)2.0, centerOfCuboidZ + breadthOfCuboid / (float)2.0}, {centerOfCuboidX - lengthOfCubiod / (float)2.0, centerOfCuboidY + heightOfCuboid / (float)2.0, centerOfCuboidZ + breadthOfCuboid / (float)2.0}},
         {{centerOfCuboidX - lengthOfCubiod / (float)2.0, centerOfCuboidY + heightOfCuboid / (float)2.0, centerOfCuboidZ - breadthOfCuboid / (float)2.0}, {centerOfCuboidX + lengthOfCubiod / (float)2.0, centerOfCuboidY + heightOfCuboid / (float)2.0, centerOfCuboidZ - breadthOfCuboid / (float)2.0}, {centerOfCuboidX + lengthOfCubiod / (float)2.0, centerOfCuboidY - heightOfCuboid / (float)2.0, centerOfCuboidZ - breadthOfCuboid / (float)2.0}, {centerOfCuboidX - lengthOfCubiod / (float)2.0, centerOfCuboidY - heightOfCuboid / (float)2.0, centerOfCuboidZ - breadthOfCuboid / (float)2.0}},
@@ -34,7 +34,17 @@ void drawCuboidAt(float centerOfCuboidX, float centerOfCuboidY, float centerOfCu
     for (int i = 0; i < 6; i++) {
         glBegin(GL_QUADS);
         for (int j = 0; j < 4; j++) {
+            if (debug) {
+                cout << "[";
+                for (auto k : walls[i][j]) {
+                    cout << k << " ";
+                }
+                cout << "],";
+            }
             glVertex3fv(walls[i][j]);
+        }
+        if (debug) {
+            cout << endl;
         }
         glEnd();
     }
@@ -65,7 +75,8 @@ void drawTableAt(double x, double y, double z) {
     drawCuboidAt(0, -0.5, 0, 2, 2, 0.1);
 
     double corner = 0.9;
-    // legs
+
+    // legs of table
     glPushMatrix();
     glTranslatef(-corner, 0, -corner);
     drawCuboidAt(0, -0.75, 0, 0.1, 0.1, 0.5);
@@ -94,15 +105,17 @@ void drawChairAt(double x, double y, double z) {
     glTranslatef(x, y, z);
 
     glColor3f(1, 0, 0);
+    // base of chair
     drawCuboidAt(0, -0.5, 0, 0.6, 0.8, 0.1);
 
+    // back of chair
     glPushMatrix();
     glTranslatef(0, -0.1, -0.4);
     glRotatef(90, 1, 0, 0);
     drawCuboidAt(0, 0, 0, 0.6, 0.8, 0.1);
     glPopMatrix();
 
-    // legs
+    // legs of chair
     glPushMatrix();
     glTranslatef(-0.26, 0, -0.32);
     drawCuboidAt(0, -0.75, 0, 0.1, 0.1, 0.5);
@@ -151,13 +164,22 @@ void wallWithWindow() {
     drawCuboidAt(2, 0.75, 0, widthOfWalls, 3, 0.5);
     drawCuboidAt(2, -0.75, 0, widthOfWalls, 3, 0.5);
 
-    glColor3f(0.7, 0.2, 0.1);
-
+    // left pane of window
+    glColor3f(0.67, 0.85, 0.83);
     glPushMatrix();
     glTranslatef(2.1, -0.5, 0.445);
     glRotatef(-windowAngle, 0, 1, 0);
     glTranslatef(-2.1, 0.5, -0.445);
-    drawCuboidAt(2, 0, -0.1, widthOfWalls, 1.2, 1);
+    drawCuboidAt(2, 0, 0.2, widthOfWalls, 0.6, 1);
+    glPopMatrix();
+
+    // right pane of window
+    glColor3f(0.67, 0.87, 0.83);
+    glPushMatrix();
+    glTranslatef(2.1, 0, -0.7);
+    glRotatef(windowAngle, 0, 1, 0);
+    glTranslatef(-2.1, 0, 0.7);
+    drawCuboidAt(2, 0, -0.4, widthOfWalls, 0.6, 1);
     glPopMatrix();
 }
 
