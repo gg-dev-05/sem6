@@ -22,6 +22,19 @@ bool isLeftMouseButtonPressed = false;
 double rotationInY = 0;
 double changeInX = 0.0f;
 
+void DisplayStroke(GLfloat x, GLfloat y, GLfloat z, GLfloat fontSize, GLfloat pointSize, GLfloat rotate, string text) {
+    string buffer = text;
+    glPushMatrix();
+    glTranslatef(x, y, z);
+    glPointSize(pointSize);
+    glLineWidth(pointSize);
+    glRotatef(rotate, 0.0, 1.0, 0.0);
+    glScalef(fontSize, fontSize, fontSize);
+    for (auto ch : buffer)
+        glutStrokeCharacter(GLUT_STROKE_MONO_ROMAN, ch);
+    glPopMatrix();
+}
+
 void drawCuboidAt(float centerOfCuboidX, float centerOfCuboidY, float centerOfCuboidZ, float lengthOfCubiod, float breadthOfCuboid, float heightOfCuboid, bool debug = false) {
     float walls[6][4][3] = {
         {{centerOfCuboidX - lengthOfCubiod / (float)2.0, centerOfCuboidY - heightOfCuboid / (float)2.0, centerOfCuboidZ + breadthOfCuboid / (float)2.0}, {centerOfCuboidX + lengthOfCubiod / (float)2.0, centerOfCuboidY - heightOfCuboid / (float)2.0, centerOfCuboidZ + breadthOfCuboid / (float)2.0}, {centerOfCuboidX + lengthOfCubiod / (float)2.0, centerOfCuboidY + heightOfCuboid / (float)2.0, centerOfCuboidZ + breadthOfCuboid / (float)2.0}, {centerOfCuboidX - lengthOfCubiod / (float)2.0, centerOfCuboidY + heightOfCuboid / (float)2.0, centerOfCuboidZ + breadthOfCuboid / (float)2.0}},
@@ -187,6 +200,11 @@ void leftWallWithTV() {
     drawCuboidAt(-2, 0, 0, widthOfWalls, 4, 2);  // left
     glColor3f(0, 0, 0);
     drawCuboidAt(-1.8, 0, 0, widthOfWalls, 2, 1);  // tv
+    glColor3f(1, 1, 1);
+    // glPushMatrix();
+    // glRotatef(90, 0, 1, 0);
+    DisplayStroke(-1.65, 0, 0.7, 0.001, 1, 90, "Garvit Galgat");
+    // glPopMatrix();
 }
 
 void displayFunction(void) {
@@ -345,7 +363,14 @@ void handleMouseFunction(int button, int state, int currentPositionX, int curren
 }
 
 int main(int argc, char *argv[]) {
-    cout << "W => FORWARD\nS => BACKWARD\n[ => UP\n] => DOWN\nr => OPEN GATE/WINDOW\nR => CLOSE GATE/WINDOW\nMOUSE => ROTATE VIEW\nESC => EXIT\n";
+    cout << "W / SCROLL UP -> MOVE IN FORWARD DIRECTION\n";
+    cout << "S / SCROLL DOWN -> MOVE IN BACKWARD DIRECTION\n";
+    cout << "E -> MOVE IN UPWARDS DIRECTION\n";
+    cout << "Q -> MOVE IN DOWNWARDS DIRECTION\n";
+    cout << "RIGHT CLICK -> SWITCH BETWEEN LINE MODE AND FILL MODE\n";
+    cout << "LEFT CLICK + MOVE -> ROTATION ABOUT ORIGIN\n";
+    cout << "r / R -> INTERACT WITH DOOR\n";
+    cout << "t / T -> INTERACT WITH WINDOW\n";
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
     glutInitWindowSize(WIDTH, HEIGHT);
