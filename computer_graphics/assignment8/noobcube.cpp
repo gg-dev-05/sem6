@@ -1,3 +1,6 @@
+// 190001016
+// Garvit Galgat
+
 #include <bits/stdc++.h>
 #include <GL/glut.h>
 using namespace std;
@@ -6,25 +9,27 @@ using namespace std;
 #define HEIGHT 500
 
 bool LINE_MODE = true;
-float wallWidth = 0.2;
-float gateAngle = 0;
-double cameraX = 0, cameraY = 0, cameraZ = 5;
-double cameraLookAtX = 0, cameraLookAtY = 0, cameraLookAtZ = 0;
+double widthOfWalls = 0.2;
+double doorAngle = 0;
+double windowAngle = 0;
+double cameraPositionInX = 0, cameraPositionInY = 0, cameraPositionInZ = 5;
+double cameraLookAtCoordinateInX = 0, cameraLookAtCoordinateInY = 0, cameraLookAtCoordinateInZ = 0;
 double theta = 0;
-double speed = 0.1;
+double movementSpeed = 0.1;
+double cameraUpVector[] = {0, 1, 0};
 
-bool isLMBPressed = false;
-double rotateY = 0;
-double xDiff = 0.0f;
+bool isLeftMouseButtonPressed = false;
+double rotationInY = 0;
+double changeInX = 0.0f;
 
-void drawCuboid(float centerX, float centerY, float centerZ, float l, float b, float h) {
+void drawCuboidAt(float centerOfCuboidX, float centerOfCuboidY, float centerOfCuboidZ, float lengthOfCubiod, float breadthOfCuboid, float heightOfCuboid) {
     float walls[6][4][3] = {
-        {{centerX - l / (float)2.0, centerY - h / (float)2.0, centerZ + b / (float)2.0}, {centerX + l / (float)2.0, centerY - h / (float)2.0, centerZ + b / (float)2.0}, {centerX + l / (float)2.0, centerY + h / (float)2.0, centerZ + b / (float)2.0}, {centerX - l / (float)2.0, centerY + h / (float)2.0, centerZ + b / (float)2.0}},
-        {{centerX - l / (float)2.0, centerY + h / (float)2.0, centerZ - b / (float)2.0}, {centerX + l / (float)2.0, centerY + h / (float)2.0, centerZ - b / (float)2.0}, {centerX + l / (float)2.0, centerY - h / (float)2.0, centerZ - b / (float)2.0}, {centerX - l / (float)2.0, centerY - h / (float)2.0, centerZ - b / (float)2.0}},
-        {{centerX + l / (float)2.0, centerY - h / (float)2.0, centerZ + b / (float)2.0}, {centerX + l / (float)2.0, centerY - h / (float)2.0, centerZ - b / (float)2.0}, {centerX + l / (float)2.0, centerY + h / (float)2.0, centerZ - b / (float)2.0}, {centerX + l / (float)2.0, centerY + h / (float)2.0, centerZ + b / (float)2.0}},
-        {{centerX - l / (float)2.0, centerY - h / (float)2.0, centerZ + b / (float)2.0}, {centerX - l / (float)2.0, centerY + h / (float)2.0, centerZ + b / (float)2.0}, {centerX - l / (float)2.0, centerY + h / (float)2.0, centerZ - b / (float)2.0}, {centerX - l / (float)2.0, centerY - h / (float)2.0, centerZ - b / (float)2.0}},
-        {{centerX - l / (float)2.0, centerY + h / (float)2.0, centerZ + b / (float)2.0}, {centerX + l / (float)2.0, centerY + h / (float)2.0, centerZ + b / (float)2.0}, {centerX + l / (float)2.0, centerY + h / (float)2.0, centerZ - b / (float)2.0}, {centerX - l / (float)2.0, centerY + h / (float)2.0, centerZ - b / (float)2.0}},
-        {{centerX - l / (float)2.0, centerY - h / (float)2.0, centerZ + b / (float)2.0}, {centerX - l / (float)2.0, centerY - h / (float)2.0, centerZ - b / (float)2.0}, {centerX + l / (float)2.0, centerY - h / (float)2.0, centerZ - b / (float)2.0}, {centerX + l / (float)2.0, centerY - h / (float)2.0, centerZ + b / (float)2.0}}};
+        {{centerOfCuboidX - lengthOfCubiod / (float)2.0, centerOfCuboidY - heightOfCuboid / (float)2.0, centerOfCuboidZ + breadthOfCuboid / (float)2.0}, {centerOfCuboidX + lengthOfCubiod / (float)2.0, centerOfCuboidY - heightOfCuboid / (float)2.0, centerOfCuboidZ + breadthOfCuboid / (float)2.0}, {centerOfCuboidX + lengthOfCubiod / (float)2.0, centerOfCuboidY + heightOfCuboid / (float)2.0, centerOfCuboidZ + breadthOfCuboid / (float)2.0}, {centerOfCuboidX - lengthOfCubiod / (float)2.0, centerOfCuboidY + heightOfCuboid / (float)2.0, centerOfCuboidZ + breadthOfCuboid / (float)2.0}},
+        {{centerOfCuboidX - lengthOfCubiod / (float)2.0, centerOfCuboidY + heightOfCuboid / (float)2.0, centerOfCuboidZ - breadthOfCuboid / (float)2.0}, {centerOfCuboidX + lengthOfCubiod / (float)2.0, centerOfCuboidY + heightOfCuboid / (float)2.0, centerOfCuboidZ - breadthOfCuboid / (float)2.0}, {centerOfCuboidX + lengthOfCubiod / (float)2.0, centerOfCuboidY - heightOfCuboid / (float)2.0, centerOfCuboidZ - breadthOfCuboid / (float)2.0}, {centerOfCuboidX - lengthOfCubiod / (float)2.0, centerOfCuboidY - heightOfCuboid / (float)2.0, centerOfCuboidZ - breadthOfCuboid / (float)2.0}},
+        {{centerOfCuboidX + lengthOfCubiod / (float)2.0, centerOfCuboidY - heightOfCuboid / (float)2.0, centerOfCuboidZ + breadthOfCuboid / (float)2.0}, {centerOfCuboidX + lengthOfCubiod / (float)2.0, centerOfCuboidY - heightOfCuboid / (float)2.0, centerOfCuboidZ - breadthOfCuboid / (float)2.0}, {centerOfCuboidX + lengthOfCubiod / (float)2.0, centerOfCuboidY + heightOfCuboid / (float)2.0, centerOfCuboidZ - breadthOfCuboid / (float)2.0}, {centerOfCuboidX + lengthOfCubiod / (float)2.0, centerOfCuboidY + heightOfCuboid / (float)2.0, centerOfCuboidZ + breadthOfCuboid / (float)2.0}},
+        {{centerOfCuboidX - lengthOfCubiod / (float)2.0, centerOfCuboidY - heightOfCuboid / (float)2.0, centerOfCuboidZ + breadthOfCuboid / (float)2.0}, {centerOfCuboidX - lengthOfCubiod / (float)2.0, centerOfCuboidY + heightOfCuboid / (float)2.0, centerOfCuboidZ + breadthOfCuboid / (float)2.0}, {centerOfCuboidX - lengthOfCubiod / (float)2.0, centerOfCuboidY + heightOfCuboid / (float)2.0, centerOfCuboidZ - breadthOfCuboid / (float)2.0}, {centerOfCuboidX - lengthOfCubiod / (float)2.0, centerOfCuboidY - heightOfCuboid / (float)2.0, centerOfCuboidZ - breadthOfCuboid / (float)2.0}},
+        {{centerOfCuboidX - lengthOfCubiod / (float)2.0, centerOfCuboidY + heightOfCuboid / (float)2.0, centerOfCuboidZ + breadthOfCuboid / (float)2.0}, {centerOfCuboidX + lengthOfCubiod / (float)2.0, centerOfCuboidY + heightOfCuboid / (float)2.0, centerOfCuboidZ + breadthOfCuboid / (float)2.0}, {centerOfCuboidX + lengthOfCubiod / (float)2.0, centerOfCuboidY + heightOfCuboid / (float)2.0, centerOfCuboidZ - breadthOfCuboid / (float)2.0}, {centerOfCuboidX - lengthOfCubiod / (float)2.0, centerOfCuboidY + heightOfCuboid / (float)2.0, centerOfCuboidZ - breadthOfCuboid / (float)2.0}},
+        {{centerOfCuboidX - lengthOfCubiod / (float)2.0, centerOfCuboidY - heightOfCuboid / (float)2.0, centerOfCuboidZ + breadthOfCuboid / (float)2.0}, {centerOfCuboidX - lengthOfCubiod / (float)2.0, centerOfCuboidY - heightOfCuboid / (float)2.0, centerOfCuboidZ - breadthOfCuboid / (float)2.0}, {centerOfCuboidX + lengthOfCubiod / (float)2.0, centerOfCuboidY - heightOfCuboid / (float)2.0, centerOfCuboidZ - breadthOfCuboid / (float)2.0}, {centerOfCuboidX + lengthOfCubiod / (float)2.0, centerOfCuboidY - heightOfCuboid / (float)2.0, centerOfCuboidZ + breadthOfCuboid / (float)2.0}}};
 
     for (int i = 0; i < 6; i++) {
         glBegin(GL_QUADS);
@@ -35,108 +40,146 @@ void drawCuboid(float centerX, float centerY, float centerZ, float l, float b, f
     }
 }
 
-void drawDoor() {
-    drawCuboid(0, -0.35, 2, 1.36, wallWidth, 1.7);
+void drawDoorWithDoorKnob() {
+    glColor3f(0.6, 0.3, 0.09);
+    drawCuboidAt(0, -0.35, 2, 1.36, widthOfWalls, 1.7);
+    glColor3f(1, 1, 1);
+
     glPushMatrix();
-    glColor3f(1, 0, 1);
-    glTranslatef(-0.5, -0.3, 2);
-    glutSolidSphere(0.12, 10, 10);
-    glTranslatef(0.5, 0.3, -2);
+    glTranslatef(-0.5, -0.3, 2.1);
+    glutSolidSphere(0.05, 10, 10);
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(-0.5, -0.3, 1.9);
+    glutSolidSphere(0.05, 10, 10);
     glPopMatrix();
 }
 
-void drawTable() {
+void drawTableAt(double x, double y, double z) {
     glPushMatrix();
-    glTranslatef(-0.8, 0, -0.8);
+    glTranslatef(x, y, z);
 
     // base of table
-    glColor3f(0.6, 0.1, 0.6);
-    drawCuboid(0, -0.5, 0, 2, 2, 0.1);
+    glColor3f(0, 0.7, 0.8);
+    drawCuboidAt(0, -0.5, 0, 2, 2, 0.1);
+
+    double corner = 0.9;
+    // legs
+    glPushMatrix();
+    glTranslatef(-corner, 0, -corner);
+    drawCuboidAt(0, -0.75, 0, 0.1, 0.1, 0.5);
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(corner, 0, -corner);
+    drawCuboidAt(0, -0.75, 0, 0.1, 0.1, 0.5);
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(-corner, 0, corner);
+    drawCuboidAt(0, -0.75, 0, 0.1, 0.1, 0.5);
+    glPopMatrix();
+
+    glPushMatrix();
+    glTranslatef(corner, 0, corner);
+    drawCuboidAt(0, -0.75, 0, 0.1, 0.1, 0.5);
+    glPopMatrix();
+
+    glPopMatrix();
+}
+
+void drawChairAt(double x, double y, double z) {
+    glPushMatrix();
+    glTranslatef(x, y, z);
+
+    glColor3f(1, 0, 0);
+    drawCuboidAt(0, -0.5, 0, 0.6, 0.8, 0.1);
+
+    glPushMatrix();
+    glTranslatef(0, -0.1, -0.4);
+    glRotatef(90, 1, 0, 0);
+    drawCuboidAt(0, 0, 0, 0.6, 0.8, 0.1);
+    glPopMatrix();
 
     // legs
     glPushMatrix();
-    glTranslatef(-1, 0, -1);
-    drawCuboid(0, -0.75, 0, 0.1, 0.1, 0.5);
+    glTranslatef(-0.26, 0, -0.32);
+    drawCuboidAt(0, -0.75, 0, 0.1, 0.1, 0.5);
     glPopMatrix();
 
     glPushMatrix();
-    glTranslatef(1, 0, -1);
-    drawCuboid(0, -0.75, 0, 0.1, 0.1, 0.5);
+    glTranslatef(-0.26, 0, 0.32);
+    drawCuboidAt(0, -0.75, 0, 0.1, 0.1, 0.5);
     glPopMatrix();
 
     glPushMatrix();
-    glTranslatef(-1, 0, 1);
-    drawCuboid(0, -0.75, 0, 0.1, 0.1, 0.5);
+    glTranslatef(0.26, 0, 0.32);
+    drawCuboidAt(0, -0.75, 0, 0.1, 0.1, 0.5);
     glPopMatrix();
 
     glPushMatrix();
-    glTranslatef(1, 0, 1);
-    drawCuboid(0, -0.75, 0, 0.1, 0.1, 0.5);
+    glTranslatef(0.26, 0, -0.32);
+    drawCuboidAt(0, -0.75, 0, 0.1, 0.1, 0.5);
     glPopMatrix();
 
     glPopMatrix();
 }
 
-void frontWallWithGate() {
-    double x = -4.0 / 2.8;
-    glColor3f(0.2, 0.7, 0.1);
-    drawCuboid(x, 0, 2, x, wallWidth, 2);
-    drawCuboid(-x, 0, 2, x, wallWidth, 2);
-    drawCuboid(0, 0.75, 2, 3, wallWidth, 0.5);
+void drawFrontWallWithDoor() {
+    glColor3f(0.72, 0.76, 0.87);
+    drawCuboidAt(1.428, 0, 2, 1.428, widthOfWalls, 2);
+    drawCuboidAt(-1.428, 0, 2, 1.428, widthOfWalls, 2);
+    drawCuboidAt(0, 0.75, 2, 3, widthOfWalls, 0.5);
 
     // door
     glPushMatrix();
     glColor3f(0.8, 0.7, 0.8);
     glTranslatef(0.68, -1.2, 2.0);
-    glRotatef(gateAngle, 0, 1, 0);
+    glRotatef(doorAngle, 0, 1, 0);
     glTranslatef(-0.68, 1.2, -2.0);
-    drawDoor();
+    drawDoorWithDoorKnob();
     glPopMatrix();
-
-    glColor3f(0.2, 0.7, 0.1);
-    drawCuboid(0, 0, -2, 4, wallWidth, 2);  // back
-    drawCuboid(-2, 0, 0, wallWidth, 4, 2);  // left
 }
 
 void wallWithWindow() {
     // walls
-    double x = -4.0 / 2.8;
+    double temp = -4.0 / 2.8;
     glColor3f(0.9, 0.7, 0.1);
-    drawCuboid(2, 0, x, wallWidth, x, 2);
-    drawCuboid(2, 0, -x - 0.25, wallWidth, x, 2);
-    drawCuboid(2, 0.75, 0, wallWidth, 3, 0.5);
-    drawCuboid(2, -0.75, 0, wallWidth, 3, 0.5);
+    drawCuboidAt(2, 0, temp, widthOfWalls, temp, 2);
+    drawCuboidAt(2, 0, -temp - 0.25, widthOfWalls, temp, 2);
+    drawCuboidAt(2, 0.75, 0, widthOfWalls, 3, 0.5);
+    drawCuboidAt(2, -0.75, 0, widthOfWalls, 3, 0.5);
 
     glColor3f(0.7, 0.2, 0.1);
 
     glPushMatrix();
     glTranslatef(2.1, -0.5, 0.445);
-    glRotatef(-gateAngle, 0, 1, 0);
+    glRotatef(-windowAngle, 0, 1, 0);
     glTranslatef(-2.1, 0.5, -0.445);
-    drawCuboid(2, 0, -0.1, wallWidth, 1.2, 1);
+    drawCuboidAt(2, 0, -0.1, widthOfWalls, 1.2, 1);
     glPopMatrix();
 }
 
-void display(void) {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+void leftWallWithTV() {
+    drawCuboidAt(-2, 0, 0, widthOfWalls, 4, 2);  // left
+    glColor3f(0, 0, 0);
+    drawCuboidAt(-1.8, 0, 0, widthOfWalls, 2, 1);  // tv
+}
 
-    if (LINE_MODE == 0)
+void displayFunction(void) {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClearColor(0.1, 0.58, 0.67, 1);
+
+    // select between line modes
+    if (LINE_MODE)
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     else
         glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
     glLoadIdentity();
-    gluLookAt(cameraX, cameraY, cameraZ, cameraLookAtX, cameraLookAtY, cameraLookAtZ, 0, 1, 0);
-    glRotatef(rotateY, 0, 1, 0);
-
-    frontWallWithGate();
-
-    wallWithWindow();
-
-    glColor3f(0.3, 0.1, 0.5);
-    drawCuboid(0, -1.1, 0, 8, 8, wallWidth);  // bottom
-
-    drawTable();
+    gluLookAt(cameraPositionInX, cameraPositionInY, cameraPositionInZ, cameraLookAtCoordinateInX, cameraLookAtCoordinateInY, cameraLookAtCoordinateInZ, cameraUpVector[0], cameraUpVector[1], cameraUpVector[2]);
+    glRotatef(rotationInY, 0, 1, 0);
 
     float roof[4][3][3] = {
         {{-2, 1, 2}, {2, 1, 2}, {0, 3, 0}},
@@ -145,58 +188,93 @@ void display(void) {
         {{-2, 1, 2}, {-2, 1, -2}, {0, 3, 0}},
     };
 
+    drawFrontWallWithDoor();  // front
+    glColor3f(0.9, 0.7, 0.1);
+    drawCuboidAt(0, 0, -2, 4, widthOfWalls, 2);  // back
+    leftWallWithTV();
+    wallWithWindow();  // right
+    glColor3f(0.92, 0.71, 0.36);
     for (int i = 0; i < 4; i++) {
         glBegin(GL_TRIANGLES);
-        glColor3f(0.2, 0.5 * i, 0.2);
         for (int j = 0; j < 3; j++) {
             glVertex3fv(roof[i][j]);
         }
         glEnd();
     }
 
+    glColor3f(0.32, 0.87, 0.24);
+    drawCuboidAt(0, -1.1, 0, 100, 100, widthOfWalls);  // bottom
+
+    // furniture
+    drawTableAt(0, 0, 0);
+
+    drawChairAt(0, -0.2, -0.8);
+
+    glPushMatrix();
+    glRotatef(-90, 0, 1, 0);
+    drawChairAt(0, -0.2, -0.8);
+    glPopMatrix();
+
+    glPushMatrix();
+    glRotatef(90, 0, 1, 0);
+    drawChairAt(0, -0.2, -0.8);
+    glPopMatrix();
+
     glFlush();
     glutSwapBuffers();
 }
 
-void reshape(int w, int h) {
-    glViewport(0, 0, (GLsizei)w, (GLsizei)h);
+void reshapeFunction(int widthOfWindow, int heightOfWindow) {
+    glViewport(0, 0, (GLsizei)widthOfWindow, (GLsizei)heightOfWindow);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(60, (GLfloat)w / (GLfloat)h, 0.0001, 200);
+    gluPerspective(60, (GLfloat)widthOfWindow / (GLfloat)heightOfWindow, 0.0001, 200);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    gluLookAt(cameraX, cameraY, cameraZ, cameraLookAtX, cameraLookAtY, cameraLookAtZ, 0, 1, 0);
+    gluLookAt(cameraPositionInX, cameraPositionInY, cameraPositionInZ, cameraLookAtCoordinateInX, cameraLookAtCoordinateInY, cameraLookAtCoordinateInZ, cameraUpVector[0], cameraUpVector[1], cameraUpVector[2]);
 }
 
-void keyboard(unsigned char key, int x, int y) {
+void keyboardFunction(unsigned char key, int mouseX, int mouseY) {
     switch (key) {
-        case 'w':
-            cameraX += speed * sin(theta);
-            cameraZ -= speed * cos(theta);
-            cameraLookAtX += speed * sin(theta);
-            cameraLookAtZ -= speed * cos(theta);
+        case 'w':  // move forwards
+            cameraPositionInX += movementSpeed * sin(theta);
+            cameraPositionInZ -= movementSpeed * cos(theta);
+            cameraLookAtCoordinateInX += movementSpeed * sin(theta);
+            cameraLookAtCoordinateInZ -= movementSpeed * cos(theta);
             break;
-        case 's':
-            cameraX -= speed * sin(theta);
-            cameraZ += speed * cos(theta);
-            cameraLookAtX += speed * sin(theta);
-            cameraLookAtZ -= speed * cos(theta);
+        case 's':  // move backwards
+            cameraPositionInX -= movementSpeed * sin(theta);
+            cameraPositionInZ += movementSpeed * cos(theta);
+            cameraLookAtCoordinateInX += movementSpeed * sin(theta);
+            cameraLookAtCoordinateInZ -= movementSpeed * cos(theta);
             break;
-        case '[':
-            cameraY += 0.1;
-            cameraLookAtY += 0.1;
+        case 'e':  // move up
+            cameraPositionInY += 0.1;
+            cameraLookAtCoordinateInY += 0.1;
+            if (cameraPositionInY >= 0.6) cameraPositionInY = 0.6;
+            if (cameraLookAtCoordinateInY >= 0.6) cameraLookAtCoordinateInY = 0.6;
             break;
-        case ']':
-            cameraY -= 0.1;
-            cameraLookAtY -= 0.1;
+        case 'q':  // move down
+            cameraPositionInY -= 0.1;
+            cameraLookAtCoordinateInY -= 0.1;
+            if (cameraPositionInY <= -0.8) cameraPositionInY = -0.8;
+            if (cameraLookAtCoordinateInY <= -0.8) cameraLookAtCoordinateInY = -0.8;
             break;
-        case 'r':
-            gateAngle += 10;
-            if (gateAngle >= 90) gateAngle = 90;
+        case 'r':  // open door
+            doorAngle += 10;
+            if (doorAngle >= 90) doorAngle = 90;
             break;
-        case 'R':
-            gateAngle -= 10;
-            if (gateAngle <= 0) gateAngle = 0;
+        case 'R':  // close door
+            doorAngle -= 10;
+            if (doorAngle <= 0) doorAngle = 0;
+            break;
+        case 't':
+            windowAngle += 10;
+            if (windowAngle >= 90) windowAngle = 90;
+            break;
+        case 'T':
+            windowAngle -= 10;
+            if (windowAngle <= 0) windowAngle = 0;
             break;
         case 27:
             exit(0);
@@ -206,33 +284,41 @@ void keyboard(unsigned char key, int x, int y) {
     glutPostRedisplay();
 }
 
-void mouseMotion(int currX, int currY) {
-    if (isLMBPressed) {
-        rotateY = currX - xDiff;
+void mouseMotionFunction(int currentPositionX, int currentPositionY) {
+    // update rotation and run display again
+    if (isLeftMouseButtonPressed) {
+        rotationInY = currentPositionX - changeInX;
         glutPostRedisplay();
     }
 }
 
-void handleMouse(int button, int state, int currX, int currY) {
+void handleMouseFunction(int button, int state, int currentPositionX, int currentPositionY) {
     if (state == GLUT_DOWN) {
-        if (button == 3 || button == 4) {
-            int sign = (button == 3 ? 1 : -1);
-            cameraX += sign * speed * sin(theta);
-            cameraZ -= sign * speed * cos(theta);
-            cameraLookAtX += sign * speed * sin(theta);
-            cameraLookAtZ -= sign * speed * cos(theta);
+        if (button == 3) {  // zoom in
+            cameraPositionInX += movementSpeed * sin(theta);
+            cameraPositionInZ -= movementSpeed * cos(theta);
+            cameraLookAtCoordinateInX += movementSpeed * sin(theta);
+            cameraLookAtCoordinateInZ -= movementSpeed * cos(theta);
             glutPostRedisplay();
         }
-        if (button == GLUT_LEFT_BUTTON) {
-            isLMBPressed = true;
-            xDiff = currX - rotateY;
+        if (button == 4) {  // zoom out
+            cameraPositionInX += -1 * movementSpeed * sin(theta);
+            cameraPositionInZ -= -1 * movementSpeed * cos(theta);
+            cameraLookAtCoordinateInX += -1 * movementSpeed * sin(theta);
+            cameraLookAtCoordinateInZ -= -1 * movementSpeed * cos(theta);
+            glutPostRedisplay();
+        }
+        if (button == GLUT_LEFT_BUTTON) {  // left button to rotate world
+            isLeftMouseButtonPressed = true;
+            changeInX = currentPositionX - rotationInY;
         }
         if (button == GLUT_RIGHT_BUTTON) {
             LINE_MODE = !LINE_MODE;
             glutPostRedisplay();
         }
     } else {
-        isLMBPressed = false;
+        // set left mouse button as not pressed
+        isLeftMouseButtonPressed = false;
     }
 }
 
@@ -241,14 +327,17 @@ int main(int argc, char *argv[]) {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
     glutInitWindowSize(WIDTH, HEIGHT);
-    glutCreateWindow("");
-    glEnable(GL_DEPTH_TEST);
-    glutDisplayFunc(display);
-    glutReshapeFunc(reshape);
+    glutCreateWindow("Assignment 8");
 
-    glutMouseFunc(handleMouse);
-    glutMotionFunc(mouseMotion);
-    glutKeyboardFunc(keyboard);
+    glEnable(GL_DEPTH_TEST);
+
+    glutDisplayFunc(displayFunction);
+    glutReshapeFunc(reshapeFunction);
+
+    glutMouseFunc(handleMouseFunction);
+    glutMotionFunc(mouseMotionFunction);
+    glutKeyboardFunc(keyboardFunction);
+
     glutMainLoop();
     return 0;
 }
