@@ -1,6 +1,3 @@
-// 190001016
-// Garvit Galgat
-
 #include <bits/stdc++.h>
 #include <GL/glut.h>
 using namespace std;
@@ -8,19 +5,24 @@ using namespace std;
 #define WIDTH 500
 #define HEIGHT 500
 
-bool LINE_MODE = true;
+bool LINE_MODE = false;
 double widthOfWalls = 0.2;
 double doorAngle = 0;
-double windowAngle = 0;
+double window1Angle = 0;
+double window2Angle = 0;
 double cameraPositionInX = 0, cameraPositionInY = 0, cameraPositionInZ = 5;
+double aspectRatio = 1.0;
+double fieldOfView = 60;
 double cameraLookAtCoordinateInX = 0, cameraLookAtCoordinateInY = 0, cameraLookAtCoordinateInZ = 0;
-double theta = 0;
 double movementSpeed = 0.1;
 double cameraUpVector[] = {0, 1, 0};
 
 bool isLeftMouseButtonPressed = false;
 double rotationInY = 0;
+double rotationInX = 0;
 double changeInX = 0.0f;
+double changeInY = 0.0f;
+bool allowRotationAlongX = false;
 
 void DisplayStroke(GLfloat x, GLfloat y, GLfloat z, GLfloat fontSize, GLfloat pointSize, GLfloat rotate, string text) {
     string buffer = text;
@@ -168,7 +170,7 @@ void drawFrontWallWithDoor() {
     glPopMatrix();
 }
 
-void wallWithWindow() {
+void wallWithWindow(double windowAngle) {
     // walls
     double temp = -4.0 / 2.8;
     glColor3f(0.9, 0.7, 0.1);
@@ -178,8 +180,8 @@ void wallWithWindow() {
     drawCuboidAt(2, -0.75, 0, widthOfWalls, 3, 0.5);
 
     // left pane of window
-    glColor3f(0.67, 0.85, 0.83);
     glPushMatrix();
+    glColor4f(0.60, 0.33, 0.08, 0.9);
     glTranslatef(2.1, -0.5, 0.445);
     glRotatef(-windowAngle, 0, 1, 0);
     glTranslatef(-2.1, 0.5, -0.445);
@@ -187,8 +189,8 @@ void wallWithWindow() {
     glPopMatrix();
 
     // right pane of window
-    glColor3f(0.67, 0.87, 0.83);
     glPushMatrix();
+    glColor4f(0.60, 0.33, 0.08, 0.9);
     glTranslatef(2.1, 0, -0.7);
     glRotatef(windowAngle, 0, 1, 0);
     glTranslatef(-2.1, 0, 0.7);
@@ -208,6 +210,7 @@ void leftWallWithTV() {
 }
 
 void displayFunction(void) {
+    gluPerspective(fieldOfView, aspectRatio, 0.0001, 200);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(0.1, 0.58, 0.67, 1);
 
@@ -220,19 +223,30 @@ void displayFunction(void) {
     glLoadIdentity();
     gluLookAt(cameraPositionInX, cameraPositionInY, cameraPositionInZ, cameraLookAtCoordinateInX, cameraLookAtCoordinateInY, cameraLookAtCoordinateInZ, cameraUpVector[0], cameraUpVector[1], cameraUpVector[2]);
     glRotatef(rotationInY, 0, 1, 0);
+    if (allowRotationAlongX)
+        glRotatef(rotationInX, 1, 0, 0);
 
+    float ROOF_TOP = 2;
     float roof[4][3][3] = {
-        {{-2, 1, 2}, {2, 1, 2}, {0, 3, 0}},
-        {{2, 1, 2}, {2, 1, -2}, {0, 3, 0}},
-        {{-2, 1, -2}, {2, 1, -2}, {0, 3, 0}},
-        {{-2, 1, 2}, {-2, 1, -2}, {0, 3, 0}},
+        {{-2, 1, 2}, {2, 1, 2}, {0, ROOF_TOP, 0}},
+        {{2, 1, 2}, {2, 1, -2}, {0, ROOF_TOP, 0}},
+        {{-2, 1, -2}, {2, 1, -2}, {0, ROOF_TOP, 0}},
+        {{-2, 1, 2}, {-2, 1, -2}, {0, ROOF_TOP, 0}},
     };
 
     drawFrontWallWithDoor();  // front
+
+    // back wall with window
+    glPushMatrix();
+    glRotatef(90, 0, 1, 0);
+    wallWithWindow(window2Angle);
+    glPopMatrix();
+
     glColor3f(0.9, 0.7, 0.1);
-    drawCuboidAt(0, 0, -2, 4, widthOfWalls, 2);  // back
     leftWallWithTV();
-    wallWithWindow();  // right
+    wallWithWindow(window1Angle);  // right
+
+    // TOP
     glColor3f(0.92, 0.71, 0.36);
     for (int i = 0; i < 4; i++) {
         glBegin(GL_TRIANGLES);
@@ -268,7 +282,7 @@ void reshapeFunction(int widthOfWindow, int heightOfWindow) {
     glViewport(0, 0, (GLsizei)widthOfWindow, (GLsizei)heightOfWindow);
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(60, (GLfloat)widthOfWindow / (GLfloat)heightOfWindow, 0.0001, 200);
+    gluPerspective(fieldOfView, aspectRatio, 0.0001, 200);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
     gluLookAt(cameraPositionInX, cameraPositionInY, cameraPositionInZ, cameraLookAtCoordinateInX, cameraLookAtCoordinateInY, cameraLookAtCoordinateInZ, cameraUpVector[0], cameraUpVector[1], cameraUpVector[2]);
@@ -277,16 +291,12 @@ void reshapeFunction(int widthOfWindow, int heightOfWindow) {
 void keyboardFunction(unsigned char key, int mouseX, int mouseY) {
     switch (key) {
         case 'w':  // move forwards
-            cameraPositionInX += movementSpeed * sin(theta);
-            cameraPositionInZ -= movementSpeed * cos(theta);
-            cameraLookAtCoordinateInX += movementSpeed * sin(theta);
-            cameraLookAtCoordinateInZ -= movementSpeed * cos(theta);
+            cameraPositionInZ -= movementSpeed;
+            cameraLookAtCoordinateInZ -= movementSpeed;
             break;
         case 's':  // move backwards
-            cameraPositionInX -= movementSpeed * sin(theta);
-            cameraPositionInZ += movementSpeed * cos(theta);
-            cameraLookAtCoordinateInX += movementSpeed * sin(theta);
-            cameraLookAtCoordinateInZ -= movementSpeed * cos(theta);
+            cameraPositionInZ += movementSpeed;
+            cameraLookAtCoordinateInZ -= movementSpeed;
             break;
         case 'e':  // move up
             cameraPositionInY += 0.1;
@@ -308,16 +318,45 @@ void keyboardFunction(unsigned char key, int mouseX, int mouseY) {
             doorAngle -= 10;
             if (doorAngle <= 0) doorAngle = 0;
             break;
-        case 't':
-            windowAngle += 10;
-            if (windowAngle >= 90) windowAngle = 90;
+        case '[':
+            window1Angle += 10;
+            if (window1Angle >= 90) window1Angle = 90;
             break;
-        case 'T':
-            windowAngle -= 10;
-            if (windowAngle <= 0) windowAngle = 0;
+        case ']':
+            window1Angle -= 10;
+            if (window1Angle <= 0) window1Angle = 0;
+            break;
+        case ';':
+            window2Angle += 10;
+            if (window2Angle >= 90) window2Angle = 90;
+            break;
+        case '\'':
+            window2Angle -= 10;
+            if (window2Angle <= 0) window2Angle = 0;
+            break;
+        case ',':
+            allowRotationAlongX = !allowRotationAlongX;
+            rotationInX = 0;
+            break;
+        case ' ':
+            window1Angle = 0;
+            window2Angle - 0;
+            cameraPositionInX = 0;
+            cameraPositionInY = 0;
+            cameraPositionInZ = 5;
+            cameraLookAtCoordinateInX = 0;
+            cameraLookAtCoordinateInY = 0;
+            cameraLookAtCoordinateInZ = 0;
+            rotationInY = 0;
+            rotationInX = 0;
+            changeInX = 0;
+            changeInY = 0;
+            glLoadIdentity();
+            gluLookAt(cameraPositionInX, cameraPositionInY, cameraPositionInZ, cameraLookAtCoordinateInX, cameraLookAtCoordinateInY, cameraLookAtCoordinateInZ, cameraUpVector[0], cameraUpVector[1], cameraUpVector[2]);
             break;
         case 27:
             exit(0);
+            break;
         default:
             break;
     }
@@ -328,6 +367,7 @@ void mouseMotionFunction(int currentPositionX, int currentPositionY) {
     // update rotation and run display again
     if (isLeftMouseButtonPressed) {
         rotationInY = currentPositionX - changeInX;
+        rotationInX = currentPositionY - changeInY;
         glutPostRedisplay();
     }
 }
@@ -335,22 +375,19 @@ void mouseMotionFunction(int currentPositionX, int currentPositionY) {
 void handleMouseFunction(int button, int state, int currentPositionX, int currentPositionY) {
     if (state == GLUT_DOWN) {
         if (button == 3) {  // zoom in
-            cameraPositionInX += movementSpeed * sin(theta);
-            cameraPositionInZ -= movementSpeed * cos(theta);
-            cameraLookAtCoordinateInX += movementSpeed * sin(theta);
-            cameraLookAtCoordinateInZ -= movementSpeed * cos(theta);
+            cameraPositionInZ -= movementSpeed;
+            cameraLookAtCoordinateInZ -= movementSpeed;
             glutPostRedisplay();
         }
         if (button == 4) {  // zoom out
-            cameraPositionInX += -1 * movementSpeed * sin(theta);
-            cameraPositionInZ -= -1 * movementSpeed * cos(theta);
-            cameraLookAtCoordinateInX += -1 * movementSpeed * sin(theta);
-            cameraLookAtCoordinateInZ -= -1 * movementSpeed * cos(theta);
+            cameraPositionInZ -= -1 * movementSpeed;
+            cameraLookAtCoordinateInZ -= -1 * movementSpeed;
             glutPostRedisplay();
         }
         if (button == GLUT_LEFT_BUTTON) {  // left button to rotate world
             isLeftMouseButtonPressed = true;
             changeInX = currentPositionX - rotationInY;
+            changeInY = currentPositionY - rotationInX;
         }
         if (button == GLUT_RIGHT_BUTTON) {
             LINE_MODE = !LINE_MODE;
@@ -370,13 +407,21 @@ int main(int argc, char *argv[]) {
     cout << "RIGHT CLICK -> SWITCH BETWEEN LINE MODE AND FILL MODE\n";
     cout << "LEFT CLICK + MOVE -> ROTATION ABOUT ORIGIN\n";
     cout << "r / R -> INTERACT WITH DOOR\n";
-    cout << "t / T -> INTERACT WITH WINDOW\n";
+    cout << "[ / ] -> INTERACT WITH RIGHT WINDOW\n";
+    cout << "; / \'-> INTERACT WITH BACK WINDOW\n";
+    cout << ", to SWITCH ROTATION ALONG X-AXIS\n";
+    cout << "[ ESC ] TO EXIT\n";
+    cout << "[ SPACE ] TO RESET\n";
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
     glutInitWindowSize(WIDTH, HEIGHT);
+
     glutCreateWindow("Assignment 8");
 
     glEnable(GL_DEPTH_TEST);
+    // Enable Transparency
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glEnable(GL_BLEND);
 
     glutDisplayFunc(displayFunction);
     glutReshapeFunc(reshapeFunction);
