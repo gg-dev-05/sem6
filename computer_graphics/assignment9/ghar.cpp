@@ -57,25 +57,6 @@ void drawCuboid(float centerX, float centerY, float centerZ, float l, float b, f
     glScalef(l, h, b);
     glutSolidCube(1);
     glPopMatrix();
-    // float walls[6][4][3] = {
-    //     {{centerX - l / (float)2.0, centerY - h / (float)2.0, centerZ + b / (float)2.0}, {centerX + l / (float)2.0, centerY - h / (float)2.0, centerZ + b / (float)2.0}, {centerX + l / (float)2.0, centerY + h / (float)2.0, centerZ + b / (float)2.0}, {centerX - l / (float)2.0, centerY + h / (float)2.0, centerZ + b / (float)2.0}},
-    //     {{centerX - l / (float)2.0, centerY + h / (float)2.0, centerZ - b / (float)2.0}, {centerX + l / (float)2.0, centerY + h / (float)2.0, centerZ - b / (float)2.0}, {centerX + l / (float)2.0, centerY - h / (float)2.0, centerZ - b / (float)2.0}, {centerX - l / (float)2.0, centerY - h / (float)2.0, centerZ - b / (float)2.0}},
-    //     {{centerX + l / (float)2.0, centerY - h / (float)2.0, centerZ + b / (float)2.0}, {centerX + l / (float)2.0, centerY - h / (float)2.0, centerZ - b / (float)2.0}, {centerX + l / (float)2.0, centerY + h / (float)2.0, centerZ - b / (float)2.0}, {centerX + l / (float)2.0, centerY + h / (float)2.0, centerZ + b / (float)2.0}},
-    //     {{centerX - l / (float)2.0, centerY - h / (float)2.0, centerZ + b / (float)2.0}, {centerX - l / (float)2.0, centerY + h / (float)2.0, centerZ + b / (float)2.0}, {centerX - l / (float)2.0, centerY + h / (float)2.0, centerZ - b / (float)2.0}, {centerX - l / (float)2.0, centerY - h / (float)2.0, centerZ - b / (float)2.0}},
-    //     {{centerX - l / (float)2.0, centerY + h / (float)2.0, centerZ + b / (float)2.0}, {centerX + l / (float)2.0, centerY + h / (float)2.0, centerZ + b / (float)2.0}, {centerX + l / (float)2.0, centerY + h / (float)2.0, centerZ - b / (float)2.0}, {centerX - l / (float)2.0, centerY + h / (float)2.0, centerZ - b / (float)2.0}},
-    //     {{centerX - l / (float)2.0, centerY - h / (float)2.0, centerZ + b / (float)2.0}, {centerX - l / (float)2.0, centerY - h / (float)2.0, centerZ - b / (float)2.0}, {centerX + l / (float)2.0, centerY - h / (float)2.0, centerZ - b / (float)2.0}, {centerX + l / (float)2.0, centerY - h / (float)2.0, centerZ + b / (float)2.0}}};
-
-    // for (int i = 0; i < 6; i++) {
-    //     glBegin(GL_QUADS);
-    //     for (int j = 0; j < 4; j++) {
-    //         // if (j == 1)
-    //         //     glColor3f(1, 1, 1);
-    //         // else
-    //         //     glColor3f(1, 0, 1);
-    //         glVertex3fv(walls[i][j]);
-    //     }
-    //     glEnd();
-    // }
 }
 
 void drawDoor() {
@@ -171,7 +152,6 @@ void display(void) {
     gluLookAt(cameraX, cameraY, cameraZ, cameraLookAtX, cameraLookAtY, cameraLookAtZ, 0, 1, 0);
     glRotatef(rotateY, 0, 1, 0);
 
-    lights();
     frontWallWithGate();
 
     wallWithWindow();
@@ -197,6 +177,7 @@ void display(void) {
         glEnd();
     }
 
+    lights();
     glFlush();
     glutSwapBuffers();
 }
