@@ -15,7 +15,7 @@ int yywrap(){
 
 int main(void){
 	extern FILE *yyin;
-	yyin = fopen("input.in", "r");
+	yyin = fopen("Q1.in", "r");
     yylex();
     if(flag){
         printf("YES\n");
