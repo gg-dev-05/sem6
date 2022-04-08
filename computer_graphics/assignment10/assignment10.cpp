@@ -1,3 +1,6 @@
+// 190001016
+// Garvit Galgat
+
 #include <bits/stdc++.h>
 #include <GL/glut.h>
 
@@ -7,7 +10,7 @@ float intensity = 1;
 GLfloat lightposition[] = {2.0, 2.0, 2.0, 1.0};
 bool window = true;
 typedef GLfloat point[3];
-
+int flag_time = 0;
 double rotate_x = 0, rotate_y = 0, zoom = 1, mwo = 1;
 int lightflag = 0;
 double doorAngle = 0;
@@ -101,6 +104,35 @@ void lights() {
     glEnable(GL_COLOR_MATERIAL);
 }
 
+void banner() {
+    GLUquadricObj *qobj = gluNewQuadric();
+    glPushMatrix();
+    glTranslatef(0, 0.5, 0);
+    glColor3f(0.45, 0.25, 0.13);
+    glRotatef(270, 1.0, 0, 0);
+    glPushMatrix();
+    glRotatef(-270, 1.0, 0, 0);
+
+    float num_elements = 1000;
+    float dx = 1 / num_elements;
+    for (int i = 0; i < num_elements; i++) {
+        float phase1 = i * dx;
+        int j = i + 1;
+        float phase2 = j * dx;
+
+        glColor3f(0.7, 0.7, 0.3);
+        glBegin(GL_POLYGON);
+
+        glVertex3f(dx * i, 2, (sinf((2 * 3.14159 / 500 * flag_time) + phase1)) * i / num_elements);
+        glVertex3f(dx * i, 3, (sinf((2 * 3.14159 / 500 * flag_time) + phase1)) * i / num_elements);
+        glVertex3f(dx * j, 3, (sinf((2 * 3.14159 / 500 * flag_time) + phase2)) * j / num_elements);
+        glVertex3f(dx * j, 2, (sinf((2 * 3.14159 / 500 * flag_time) + phase2)) * j / num_elements);
+
+        glEnd();
+    }
+    glPopMatrix();
+    glPopMatrix();
+}
 void display(void) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glClearColor(3 * 1.0 / 255 * intensity, 211 * 1.0 / 255 * intensity, 252 * 1.0 / 255 * intensity, 1);
@@ -185,29 +217,7 @@ void display(void) {
     glVertex3f(1.5, -1.0, 1.5);
     glEnd();
 
-    double s = 2.0;
-    if (!window) {
-        glPushMatrix();
-        glBegin(GL_QUADS);
-        glColor3f(1, 1, 1);
-        glVertex3f(1.6, -1.0 / s, -1.5 / s);
-        glVertex3f(1.6, 1.0 / s, -1.5 / s);
-        glVertex3f(1.6, 1.0 / s, 1.5 / s);
-        glVertex3f(1.6, -1.0 / s, 1.5 / s);
-        glEnd();
-        glPopMatrix();
-    } else {
-        glPushMatrix();
-        glBegin(GL_QUADS);
-        glColor3f(0.8f, 1.0f, 0.9f);
-        glRotatef(90, 1, 0, 1);
-        glVertex3f(1.6, -1.0 / s, -1.5 / s);
-        glVertex3f(1.6, 1.0 / s, -1.5 / s);
-        glVertex3f(1.6, 1.0 / s, 1.5 / s);
-        glVertex3f(1.6, -1.0 / s, 1.5 / s);
-        glEnd();
-        glPopMatrix();
-    }
+    banner();
 
     //******** LEFT ********
     glBegin(GL_QUADS);
@@ -426,6 +436,18 @@ void SpecialKeys(unsigned char key, int x, int y) {
     if (key == 'X') {
         lightposition[0] -= 0.1;
     }
+    if (key == 'y') {
+        lightposition[1] += 0.1;
+    }
+    if (key == 'Y') {
+        lightposition[1] -= 0.1;
+    }
+    if (key == 'z') {
+        lightposition[2] += 0.1;
+    }
+    if (key == 'Z') {
+        lightposition[2] -= 0.1;
+    }
 
     glutPostRedisplay();
 }
@@ -515,6 +537,11 @@ void reshape(int w, int h) {
     glLoadIdentity();
 }
 
+void spin() {
+    flag_time += 1;
+    glutPostRedisplay();
+}
+
 int main(int argc, char **argv) {
     cout << ". TO WINDOW\n";
     cout << "[ / ] TO CHANGE INTENSITY\n";
@@ -536,6 +563,7 @@ int main(int argc, char **argv) {
 
     glutMouseFunc(mouseZoom);
     glutMotionFunc(mouseRotate);
+    glutIdleFunc(spin);
 
     glutMainLoop();
     return 0;
