@@ -1,26 +1,15 @@
 %{
-#include<stdio.h> // for input
-int flag=1;
+  #include <stdio.h>
+  #include "y.tab.h"
 %}
 
 %%
-A*B*        {flag=1;}
-"\n"        {return 0;}
-.           {flag=0;} 
+[aA]  return A;
+[bB]  return B;
+\n    return NL;
+.     return yytext[0];
 %%
 
-int yywrap(){
-    return 1;
-}
-
-int main(void){
-	extern FILE *yyin;
-	yyin = fopen("Q1.in", "r");
-    yylex();
-    if(flag){
-        printf("YES\n");
-    }else{
-        printf("NO\n");
-    }
-    return 0;
+int yywrap(void){
+  return 1;
 }
