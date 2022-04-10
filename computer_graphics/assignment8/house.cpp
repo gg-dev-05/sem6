@@ -295,6 +295,14 @@ void keyboardFunction(unsigned char key, int mouseX, int mouseY) {
             cameraPositionInZ += movementSpeed;
             cameraLookAtCoordinateInZ -= movementSpeed;
             break;
+        case 'd':
+            cameraPositionInX += 1;
+            cameraLookAtCoordinateInX += 1;
+            break;
+        case 'a':
+            cameraPositionInX -= 1;
+            cameraLookAtCoordinateInX -= 1;
+            break;
         case 'e':  // move up
             cameraPositionInY += 0.1;
             cameraLookAtCoordinateInY += 0.1;
