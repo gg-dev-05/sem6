@@ -1,17 +1,12 @@
-// 190001016
-// Garvit Galgat
-
 #include <bits/stdc++.h>
+#include <GL/gl.h>
 #include <GL/glut.h>
+#include <unistd.h>
 
 using namespace std;
 
-#define SCREEN_WIDTH 500
-#define SCREEN_HEIGHT 500
-
-int totalPoints;
-vector<int> boundaryColor = {1, 0, 0};
-vector<int> fillColor = {0, 1, 0};
+vector<int> Color = {0, 1, 0};
+vector<int> Border = {1, 0, 0};
 
 class Point {
    public:
@@ -35,35 +30,36 @@ class Edge {
     }
 };
 
-class EdgeData {
+class EdgeEntry {
    public:
-    int yMaximum;
+    int y_max;
     int x;
-    int deltaX;
-    int deltaY;
-    int increment;
-    EdgeData *next;
+    int del_x;
+    int del_y;
+    int inc;
+    EdgeEntry *next;
 
-    EdgeData(int yMaximum, int x, int deltaX, int deltaY) {
-        this->yMaximum = yMaximum;
+    EdgeEntry(int y_max, int x, int del_x, int del_y) {
+        this->y_max = y_max;
         this->x = x;
-        this->deltaX = deltaX;
-        this->deltaY = deltaY;
+        this->del_x = del_x;
+        this->del_y = del_y;
         this->next = NULL;
-        this->increment = deltaX;
+        this->inc = del_x;
     }
 };
 
 vector<Point> points;
 int y_lower = INT_MAX;
 int y_upper = INT_MIN;
+
 vector<vector<Point>> Edges;
 
 bool compare(vector<Point> &P1, vector<Point> &P2) {
     return P1[0].y < P2[0].y;
 }
 
-void createEdges() {
+void create_edges() {
     int n = points.size();
     for (int i = 1; i < n; i++) {
         if (points[i - 1].y < points[i].y) {
@@ -79,21 +75,22 @@ void createEdges() {
     } else {
         Edges.push_back({points[n - 1], points[0]});
     }
+
     sort(Edges.begin(), Edges.end(), compare);
 }
 
-void createEdgeTable(vector<EdgeData *> &edgeTable) {
+void createEdgeTable(vector<EdgeEntry *> &EdgeTable) {
     int edgesIndex = 0;
     int n = Edges.size();
     for (int y = y_lower; y <= y_upper; y++) {
-        EdgeData *head = new EdgeData(0, 0, 0, 0);
-        EdgeData *ptr = head;
-        edgeTable[y] = head;
+        EdgeEntry *head = new EdgeEntry(0, 0, 0, 0);
+        EdgeEntry *ptr = head;
+        EdgeTable[y] = head;
         while (edgesIndex < n) {
             if (Edges[edgesIndex][0].y == y) {
-                int deltaX = Edges[edgesIndex][1].x - Edges[edgesIndex][0].x;
-                int deltaY = Edges[edgesIndex][1].y - Edges[edgesIndex][0].y;
-                EdgeData *Curr = new EdgeData(Edges[edgesIndex][1].y, Edges[edgesIndex][0].x, deltaX, deltaY);
+                int del_x = Edges[edgesIndex][1].x - Edges[edgesIndex][0].x;
+                int del_y = Edges[edgesIndex][1].y - Edges[edgesIndex][0].y;
+                EdgeEntry *Curr = new EdgeEntry(Edges[edgesIndex][1].y, Edges[edgesIndex][0].x, del_x, del_y);
                 ptr->next = Curr;
                 ptr = Curr;
             } else {
@@ -105,7 +102,7 @@ void createEdgeTable(vector<EdgeData *> &edgeTable) {
 }
 
 void fill(int start, int end, int y) {
-    glColor3f(fillColor[0], fillColor[1], fillColor[2]);
+    glColor3f(Color[0], Color[1], Color[2]);
     glBegin(GL_POINTS);
     for (int x = start; x < end; x++) {
         glVertex2f(x, y);
@@ -114,7 +111,7 @@ void fill(int start, int end, int y) {
     glFlush();
 }
 
-void markLine(vector<int> &fillPoints, int y) {
+void paint(vector<int> &fillPoints, int y) {
     sort(fillPoints.begin(), fillPoints.end());
     for (int i = 0; i < fillPoints.size(); i++) {
         if (i % 2 == 1)
@@ -122,25 +119,25 @@ void markLine(vector<int> &fillPoints, int y) {
     }
 }
 
-void UpdateEdgeTable(EdgeData *head, int y, vector<EdgeData *> &EdgeTable) {
-    EdgeData *ptr = head->next;
-    EdgeData *prev = head;
+void UpdateEdgeTable(EdgeEntry *head, int y, vector<EdgeEntry *> &EdgeTable) {
+    EdgeEntry *ptr = head->next;
+    EdgeEntry *prev = head;
     vector<int> fillPoints;
 
     while (ptr) {
-        if (ptr->yMaximum <= y) {
+        if (ptr->y_max <= y) {
             prev->next = ptr->next;
             ptr = ptr->next;
             continue;
         } else {
-            int deltaX = ptr->deltaX;
-            int deltaY = ptr->deltaY;
+            int del_x = ptr->del_x;
+            int del_y = ptr->del_y;
             int value = 0;
-            value += deltaX / deltaY;
-            if ((deltaX % deltaY) > deltaY / 2) {
+            value += del_x / del_y;
+            if ((del_x % del_y) > del_y / 2) {
                 value++;
             }
-            ptr->deltaX += ptr->increment;
+            ptr->del_x += ptr->inc;
             fillPoints.push_back(ptr->x + value);
         }
         prev = ptr;
@@ -153,17 +150,17 @@ void UpdateEdgeTable(EdgeData *head, int y, vector<EdgeData *> &EdgeTable) {
         fillPoints.push_back(ptr->x);
         ptr = ptr->next;
     }
-    markLine(fillPoints, y);
+    paint(fillPoints, y);
 }
 
-void fill_shape() {
-    createEdges();
+void fill_shape(int z) {
+    create_edges();
 
-    vector<EdgeData *> EdgeTable(y_upper + 1);
+    vector<EdgeEntry *> EdgeTable(y_upper + 1);
 
     createEdgeTable(EdgeTable);
 
-    EdgeData *head = new EdgeData(0, 0, 0, 0);
+    EdgeEntry *head = new EdgeEntry(0, 0, 0, 0);
     for (int y = y_lower; y < y_upper; y++) {
         UpdateEdgeTable(head, y, EdgeTable);
     }
@@ -172,8 +169,9 @@ void fill_shape() {
 void draw() {
     glClear(GL_COLOR_BUFFER_BIT);
 
+    // Outline of shape
     glLineWidth(3);
-    glColor3f(boundaryColor[0], boundaryColor[1], boundaryColor[2]);
+    glColor3f(Border[0], Border[1], Border[2]);
     glBegin(GL_LINE_LOOP);
     for (int i = 0; i < points.size(); i++) {
         glVertex2f(points[i].x, points[i].y);
@@ -181,33 +179,36 @@ void draw() {
     glEnd();
     glFlush();
 
-    fill_shape();
+    cout << "Start Fill? (Y/n)";
+    int x;
+    cin >> x;
+
+    sleep(1);
+    fill_shape(x);
 
     glFlush();
 }
 
-int main(int argc, char *argv[]) {
-    freopen("convex.in", "r", stdin);
-    cout << "Enter the total number of  points:";
-    cin >> totalPoints;
-    for (int i = 0; i < totalPoints; i++) {
+int main(int C, char *V[]) {
+    freopen("concave.in", "r", stdin);
+    int n;
+    cout << "\nEnter number of points of shape: ";
+    cin >> n;
+    cout << "\n Enter the points in clockwise manner \n";
+    for (int i = 0; i < n; i++) {
         int x, y;
-        printf("Point %d\n", i + 1);
-        printf("X:");
-        cin >> x;
-        printf("Y:");
-        cin >> y;
-        printf("\n");
-        points.push_back({x, y});
+        cout << "\nPoint " << i + 1 << " : ";
+        cin >> x >> y;
+        points.push_back(Point(x, y));
     }
 
-    glutInit(&argc, argv);
-    glutInitWindowPosition(0, 0);
-    glutInitWindowSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+    glutInit(&C, V);
+    glutInitWindowPosition(0, 000);
+    glutInitWindowSize(800, 800);
     glutInitDisplayMode(GLUT_RGB | GLUT_SINGLE);
-    glutCreateWindow("Scanline Algorithm");
+    glutCreateWindow("Scan Line Filling");
     glClearColor(0, 0, 0, 0);
-    gluOrtho2D(0, SCREEN_WIDTH, 0, SCREEN_HEIGHT);
+    gluOrtho2D(0, 800, 0, 800);
     glutDisplayFunc(draw);
     glutMainLoop();
 }
