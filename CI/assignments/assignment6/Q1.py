@@ -1,42 +1,31 @@
 import numpy as np
-class Model:
-  def __init__(self, num_inputs):
-    self.weights = np.zeros(num_inputs)
-    self.bias = 0
+from model1 import Model
 
-  def set_weight(self,num_inputs):
-    for i in range(len(num_inputs)):
-      self.weights[i]=num_inputs[i]
+train_inputs = []
+train_inputs.append(np.array([1, 1]))
+train_inputs.append(np.array([1, 2]))
+train_inputs.append(np.array([2, -1]))
+train_inputs.append(np.array([2, 0]))
+train_inputs.append(np.array([-1, 2]))
+train_inputs.append(np.array([-2, 1]))
+train_inputs.append(np.array([-1, -1]))
+train_inputs.append(np.array([-2, -2]))
 
-  def predict(self, inputs):
-    sum = np.dot(inputs, self.weights[:]) + self.bias
-    if sum >= 0:
-      prediction = 1
-    else:
-      prediction = 0
-    return prediction
+labels1 = np.array([0, 0, 0, 0, 1, 1, 1, 1])
+labels2 = np.array([0, 0, 1, 1, 0, 0, 1, 1])
 
-  def fit(self, inputs, label, learning_rate=0.5):
-    ep = 0
-    while True:
-      flag = True
-      for val, res in zip(inputs, label):
-        predictedOutput=self.predict(val)
-        if(predictedOutput != res):
-          flag = False
-          break
-      if flag == True:
-        break
-      print(f"{ep}th epoch")
-      ep = ep + 1
-      for val, res in zip(inputs, label):
-        prediction= self.predict(val)
-        print("Prediction->"+str(prediction))
-        self.weights[:] += learning_rate * (res-prediction) * val
-        self.bias += learning_rate *(res-prediction)
-        print("Updated Weights: ")
-        for i in self.weights:
-          print(i,end=" ")
-        print("")
-        print(f"Updated Bias: {self.bias}")
-        print("")
+model1 = Model(2)
+model1.fit(train_inputs, labels1)
+
+model2 = Model(2)
+model2.fit(train_inputs, labels2)
+
+for inputs in train_inputs:
+    print(inputs, end="")
+    # print(model1.predict(inputs), model2.predict(inputs))
+    model1_prediction = model1.predict(inputs)
+    model2_prediction = model2.predict(inputs)
+    print(f" {model1_prediction * 2 + model2_prediction}th class")
+
+# model1 used 2 iterations
+# model2 used 1 iterations
