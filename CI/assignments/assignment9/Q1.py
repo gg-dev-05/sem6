@@ -128,6 +128,4 @@ for i in range(0, y_pred.shape[0]):
     else:
         y_pred[i] = 0
 acc = calculate_accuracy(y_pred, y_test)
-# print(parameters["W1"])
-# print(parameters["W2"])
 print(f"accuracy is {acc}")
