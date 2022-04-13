@@ -37,38 +37,38 @@ class SHLNN:
         self.N = N
         self.M = M
         self.hidden_layer_weights = []
-        self.hidden_layer_baises = []
+        self.hidden_layer_bias = []
+
+        # initializing random weights
         for _ in range(M):
-            self.hidden_layer_baises.append(random.uniform(-0.1, 0.1))
+            self.hidden_layer_bias.append(random.uniform(-0.1, 0.1))
             w_temp = []
             for i in range(N):
                 w_temp.append(random.uniform(-0.1, 0.1))
             self.hidden_layer_weights.append(w_temp)
 
-        self.output_bais = random.uniform(-0.1, 0.1)
+        self.output_bias = random.uniform(-0.1, 0.1)
         w_temp = []
         for i in range(M):
             w_temp.append(random.uniform(-0.1, 0.1))
         self.output_weights = w_temp
 
-    def train(self, train_data, train_labels, learning_rate, number_of_iterations):
+    def train(self, train_data, train_labels, learning_rate, number_of_epochs):
         print(f"Training Model")
-        for _ in range(number_of_iterations):
-            print(f"Running Iteration Number: {_}")
+        for _ in range(number_of_epochs):
+            print(f"Running epoch Number: {_}")
             for iterator in range(len(train_data)):
                 data = train_data[iterator]
                 label = train_labels[iterator]
 
-                sum_of_hidden_layer = []
                 activated_sum_hidden_layer = []
                 for i in range(self.M):
-                    val = self.hidden_layer_baises[i]
+                    val = self.hidden_layer_bias[i]
                     for j in range(self.N):
                         val += self.hidden_layer_weights[i][j] * data[j]
-                    sum_of_hidden_layer.append(val)
                     activated_sum_hidden_layer.append(sigmoid_activation_func(val))
 
-                sum_output_layer = self.output_bais
+                sum_output_layer = self.output_bias
                 activated_sum_output_layer = 0
                 for i in range(self.M):
                     sum_output_layer += (
@@ -91,7 +91,7 @@ class SHLNN:
                     )
 
                 # update output layer baises
-                self.output_bais += (
+                self.output_bias += (
                     -1
                     * learning_rate
                     * (activated_sum_output_layer - label)
@@ -115,7 +115,7 @@ class SHLNN:
 
                 # update hidden layer baises
                 for i in range(self.M):
-                    self.hidden_layer_baises[i] += (
+                    self.hidden_layer_bias[i] += (
                         -1
                         * learning_rate
                         * (activated_sum_output_layer - label)
@@ -136,13 +136,13 @@ class SHLNN:
             sum_hidden_layer = []
             activated_sum_hidden_layer = []
             for i in range(self.M):
-                val = self.hidden_layer_baises[i]
+                val = self.hidden_layer_bias[i]
                 for j in range(self.N):
                     val += self.hidden_layer_weights[i][j] * Data[j]
                 sum_hidden_layer.append(val)
                 activated_sum_hidden_layer.append(sigmoid_activation_func(val))
 
-            sum_output_layer = self.output_bais
+            sum_output_layer = self.output_bias
             activated_sum_output_layer = 0
             for i in range(self.M):
                 sum_output_layer += (
@@ -165,35 +165,36 @@ class SHLNN:
         )
 
 
-testDataRaw = read_file("testData.csv")
-testLabelsRaw = read_file("testLabels.csv")
-trainDataRaw = read_file("trainData.csv")
-trainLabelsRaw = read_file("trainLabels.csv")
+if __name__ == "__main__":
+    testDataRaw = read_file("testData.csv")
+    testLabelsRaw = read_file("testLabels.csv")
+    trainDataRaw = read_file("trainData.csv")
+    trainLabelsRaw = read_file("trainLabels.csv")
 
-testData = []
-for row in testDataRaw:
-    a = []
-    for x in row:
-        a.append(float(x))
-    testData.append(a)
+    testData = []
+    for row in testDataRaw:
+        a = []
+        for x in row:
+            a.append(float(x))
+        testData.append(a)
 
-trainData = []
-for row in trainDataRaw:
-    a = []
-    for x in row:
-        a.append(float(x))
-    trainData.append(a)
+    trainData = []
+    for row in trainDataRaw:
+        a = []
+        for x in row:
+            a.append(float(x))
+        trainData.append(a)
 
-testLabels = []
-for row in testLabelsRaw:
-    testLabels.append(int(row[0]) - int(5))
+    testLabels = []
+    for row in testLabelsRaw:
+        testLabels.append(int(row[0]) - int(5))
 
-trainLabels = []
-for row in trainLabelsRaw:
-    trainLabels.append(float(row[0]) - 5.0)
+    trainLabels = []
+    for row in trainLabelsRaw:
+        trainLabels.append(float(row[0]) - 5.0)
 
-NN = SHLNN(len(testData[0]), 10)
+    NeuralNetwork = SHLNN(len(testData[0]), 10)
 
-NN.train(trainData, trainLabels, 0.001, 1000)
+    NeuralNetwork.train(trainData, trainLabels, 0.001, 1000)
 
-NN.test(testData, testLabels)
+    NeuralNetwork.test(testData, testLabels)

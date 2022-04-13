@@ -1,7 +1,9 @@
 import numpy as np
 
+
 def shapeFunction(x):
     return np.array(x).shape
+
 
 def parameters(input_features, num_of_neurons_in_hidden_layer, output_features):
     W1 = np.random.randn(num_of_neurons_in_hidden_layer, input_features) * 0.01
@@ -11,11 +13,14 @@ def parameters(input_features, num_of_neurons_in_hidden_layer, output_features):
     parameters = {"W1": W1, "b1": b1, "W2": W2, "b2": b2}
     return parameters
 
+
 def sigmoid(x):
     return 1 / (1 + np.exp(-x))
 
+
 def sigmoid_derivative(x):
     return x * (1 - x)
+
 
 def predict(X_test, params):
     W1, W2, b1, b2 = params["W1"], params["W2"], params["b1"], params["b2"]
@@ -115,8 +120,15 @@ for i in range(0, number_of_iterations):
         y = y.reshape(-1, 1)
         A2, cache = forward_propagation(X, parameters)
         cost = calculate_cost(A2, y)
-        W1, W2, b1, b2 = back_propagation_implementation(X, y, parameters, cache, learning_rate)
-        parameters["W1"], parameters["W2"], parameters["b1"], parameters["b2"] = W1, W2, b1, b2
+        W1, W2, b1, b2 = back_propagation_implementation(
+            X, y, parameters, cache, learning_rate
+        )
+        parameters["W1"], parameters["W2"], parameters["b1"], parameters["b2"] = (
+            W1,
+            W2,
+            b1,
+            b2,
+        )
     if i % 25 == 0 or i == 199:
         print("Cost after iteration % i: % f" % (i, cost))
 
@@ -128,6 +140,6 @@ for i in range(0, y_pred.shape[0]):
     else:
         y_pred[i] = 0
 acc = calculate_accuracy(y_pred, y_test)
-print(parameters["W1"])
-print(parameters["W2"])
-print(f"accuracy is {acc}")
+# print(parameters["W1"])
+# print(parameters["W2"])
+int(f"accuracy is {acc}")
