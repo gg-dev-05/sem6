@@ -54,15 +54,6 @@ def forward_propagation(X, params):
     return A2, cache
 
 
-def calculate_cost(A2, Y):
-    diff = Y - A2
-    diff = diff * diff
-    cost_sum = np.sum(diff)
-    cost = 1 / 2 * cost_sum
-    cost = np.squeeze(cost)
-    return cost
-
-
 def back_propagation_implementation(X, Y, params, cache, learning_rate):
     W1, W2, b1, b2 = params["W1"], params["W2"], params["b1"], params["b2"]
     A1 = cache["A1"]
@@ -119,7 +110,6 @@ for i in range(0, number_of_iterations):
         X = X.reshape(-1, 1)
         y = y.reshape(-1, 1)
         A2, cache = forward_propagation(X, parameters)
-        cost = calculate_cost(A2, y)
         W1, W2, b1, b2 = back_propagation_implementation(
             X, y, parameters, cache, learning_rate
         )
@@ -129,8 +119,6 @@ for i in range(0, number_of_iterations):
             b1,
             b2,
         )
-    if i % 25 == 0 or i == 199:
-        print("Cost after iteration % i: % f" % (i, cost))
 
 threshold = 0.5
 y_pred = predict(X_test, parameters)
@@ -142,4 +130,4 @@ for i in range(0, y_pred.shape[0]):
 acc = calculate_accuracy(y_pred, y_test)
 # print(parameters["W1"])
 # print(parameters["W2"])
-int(f"accuracy is {acc}")
+print(f"accuracy is {acc}")
